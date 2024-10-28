@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Content descriptions -->
+    <eat-comment />
+    <string name="ic_visibility_cont_desc">Hide password</string>
+    <string name="ic_visibility_off_cont_desc">Show password</string>
+    <string name="ic_clear_cont_desc">Clear text</string>
+
+    <!-- Text fields -->
+    <eat-comment />
+    <string name="tf_email_label">Email</string>
+    <string name="tf_password_label">Password</string>
+
+    <!-- Buttons -->
+    <eat-comment />
+    <string name="btn_login_text">Log in</string>
+    <string name="btn_signup_text">Sign up</string>
+    <string name="btn_forget_password_text">Forgot password?</string>
+
+    <!-- Toasts -->
+    <eat-comment />
+    <string name="toast_login_failed">Login failed</string>
+</resources>

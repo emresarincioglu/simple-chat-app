@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">SimpleChat</string>
+
+    <!-- Screens -->
+    <eat-comment />
+    <string name="screen_home_title">Home</string>
+    <string name="screen_profile_title">Profile</string>
+    <string name="screen_requests_title">Requests</string>
+
+    <!-- Content Descriptions -->
+    <eat-comment />
+    <string name="btn_nav_home_cont_desc">Navigate to home</string>
+    <string name="btn_nav_profile_cont_desc">Navigate to profile</string>
+    <string name="btn_nav_requests_cont_desc">Navigate to requests</string>
+</resources>
