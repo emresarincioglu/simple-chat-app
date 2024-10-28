@@ -12,13 +12,12 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.example.simplechat.navigation.navhost.BottomBarNavHost
 import com.example.simplechat.navigation.BottomBarRoute
+import com.example.simplechat.navigation.navhost.BottomBarNavHost
 
 @Composable
 fun BottomBarHostScreen(parentNavController: NavHostController, modifier: Modifier = Modifier) {
@@ -41,7 +40,7 @@ fun BottomBarHostScreen(parentNavController: NavHostController, modifier: Modifi
                         },
                         icon = {
                             Icon(
-                                painter = painterResource(id = item.icon),
+                                imageVector = item.icon,
                                 contentDescription = stringResource(item.contentDescription)
                             )
                         },

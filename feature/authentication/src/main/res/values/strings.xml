@@ -5,19 +5,25 @@
     <string name="ic_visibility_cont_desc">Hide password</string>
     <string name="ic_visibility_off_cont_desc">Show password</string>
     <string name="ic_clear_cont_desc">Clear text</string>
+    <string name="btn_nav_back_cont_desc">Return to previous screen</string>
 
     <!-- Text fields -->
     <eat-comment />
     <string name="tf_email_label">Email</string>
     <string name="tf_password_label">Password</string>
+    <string name="tf_full_name_label">Full name</string>
 
     <!-- Buttons -->
     <eat-comment />
     <string name="btn_login_text">Log in</string>
     <string name="btn_signup_text">Sign up</string>
     <string name="btn_forget_password_text">Forgot password?</string>
+    <string name="btn_password_reset_text">Reset password</string>
 
     <!-- Toasts -->
     <eat-comment />
     <string name="toast_login_failed">Login failed</string>
+    <string name="toast_signup_failed">Signup failed</string>
+    <string name="toast_email_sent">Email sent</string>
+    <string name="toast_email_could_not_send">Email could not be sent</string>
 </resources>

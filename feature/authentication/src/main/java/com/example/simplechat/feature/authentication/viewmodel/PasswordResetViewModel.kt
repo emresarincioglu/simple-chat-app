@@ -3,6 +3,7 @@ package com.example.simplechat.feature.authentication.viewmodel
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.simplechat.core.common.Result
@@ -13,17 +14,16 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class LoginViewModel @Inject constructor() : ViewModel() {
-    var email by mutableStateOf("")
-    var password by mutableStateOf("")
+class PasswordResetViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : ViewModel() {
+    var email by mutableStateOf(savedStateHandle["email"] ?: "")
 
-    private val _loginResult = MutableSharedFlow<Result<Boolean>>()
-    val loginResult = _loginResult.asSharedFlow()
+    private val _sendPasswordResetEmailResult = MutableSharedFlow<Result<Boolean>>()
+    val sendPasswordResetEmailResult = _sendPasswordResetEmailResult.asSharedFlow()
 
-    fun logIn() {
-        // TODO: Log in with email and password
+    fun sendPasswordResetEmail() {
+        // TODO: Send password reset email
         viewModelScope.launch {
-            _loginResult.emit(Result.Success(true))
+            _sendPasswordResetEmailResult.emit(Result.Loading)
         }
     }
 }

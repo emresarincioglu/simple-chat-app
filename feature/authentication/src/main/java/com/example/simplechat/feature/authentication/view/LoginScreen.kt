@@ -48,6 +48,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.simplechat.core.common.Result
+import com.example.simplechat.core.ui.theme.SimpleChatTheme
 import com.example.simplechat.feature.authentication.R
 import com.example.simplechat.feature.authentication.navigation.NavRoute
 import com.example.simplechat.feature.authentication.viewmodel.LoginViewModel
@@ -63,6 +64,16 @@ fun LoginScreen(
     var isLoading by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
+        with(navController.currentBackStackEntry!!.savedStateHandle) {
+            remove<String>("email")?.let {
+                viewModel.email = it
+            }
+
+            remove<String>("password")?.let {
+                viewModel.password = it
+            }
+        }
+
         viewModel.loginResult.collect { result ->
             isLoading = result is Result.Loading
             when (result) {
@@ -70,9 +81,7 @@ fun LoginScreen(
                     context, result.exception.localizedMessage, Toast.LENGTH_SHORT
                 ).show()
 
-                Result.Success(true) -> {
-                    onNavigateHome()
-                }
+                Result.Success(true) -> onNavigateHome()
 
                 Result.Success(false) -> Toast.makeText(
                     context, R.string.toast_login_failed, Toast.LENGTH_SHORT
@@ -93,7 +102,9 @@ fun LoginScreen(
         ) {
             InputTextFields(
                 viewModel = viewModel,
-                onForgetPassword = { navController.navigate(NavRoute.PasswordResetScreen.route) },
+                onForgetPassword = {
+                    navController.navigate("${NavRoute.PasswordResetScreen.route}/${viewModel.email}")
+                },
                 modifier = Modifier.width(TextFieldDefaults.MinWidth)
             )
 
@@ -104,10 +115,14 @@ fun LoginScreen(
             AuthButtons(
                 onLogIn = {
                     if (!isLoading) {
-                        viewModel.login()
+                        viewModel.logIn()
                     }
                 },
-                onSignUp = { navController.navigate(NavRoute.SignupScreen.route) },
+                onSignUp = {
+                    navController.navigate(
+                        "${NavRoute.SignupScreen.route}/${viewModel.email}/${viewModel.password}"
+                    )
+                },
                 modifier = Modifier
                     .width(TextFieldDefaults.MinWidth)
                     .padding(top = 16.dp)
@@ -197,7 +212,7 @@ fun PasswordOutlinedTextField(
 }
 
 @Composable
-fun InputTextFields(
+private fun InputTextFields(
     viewModel: LoginViewModel,
     onForgetPassword: () -> Unit,
     modifier: Modifier = Modifier
@@ -207,7 +222,7 @@ fun InputTextFields(
             value = viewModel.email,
             onValueChange = { viewModel.email = it },
             label = { Text(stringResource(R.string.tf_email_label)) },
-            leadingIcon = { Icon(Icons.Default.Email, null) },
+            leadingIcon = { Icon(Icons.Filled.Email, null) },
             keyboardOptions = KeyboardOptions.Default.copy(
                 capitalization = KeyboardCapitalization.None,
                 autoCorrectEnabled = false,
@@ -220,7 +235,7 @@ fun InputTextFields(
             value = viewModel.password,
             onValueChange = { viewModel.password = it },
             label = stringResource(R.string.tf_password_label),
-            leadingIcon = { Icon(Icons.Default.Lock, null) },
+            leadingIcon = { Icon(Icons.Filled.Lock, null) },
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -234,7 +249,7 @@ fun InputTextFields(
 }
 
 @Composable
-fun AuthButtons(onLogIn: () -> Unit, onSignUp: () -> Unit, modifier: Modifier = Modifier) {
+private fun AuthButtons(onLogIn: () -> Unit, onSignUp: () -> Unit, modifier: Modifier = Modifier) {
     Column(modifier = modifier) {
         Button(onClick = onLogIn, modifier = Modifier.fillMaxWidth()) {
             Text(stringResource(R.string.btn_login_text))
@@ -251,8 +266,10 @@ fun AuthButtons(onLogIn: () -> Unit, onSignUp: () -> Unit, modifier: Modifier = 
     }
 }
 
-@Preview(showSystemUi = true)
+@Preview
 @Composable
 private fun LoginScreenPreview() {
-    LoginScreen(navController = rememberNavController(), onNavigateHome = {})
+    SimpleChatTheme {
+        LoginScreen(navController = rememberNavController(), onNavigateHome = {})
+    }
 }
