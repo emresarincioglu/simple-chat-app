@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.simplechat.core.common"
+    namespace = "com.example.simplechat.core.network"
     compileSdk = 35
 
     defaultConfig {
@@ -40,8 +40,17 @@ dependencies {
     implementation(libs.dagger.hilt.android)
     kapt(libs.dagger.hilt.compiler)
 
+    // Firebase
+    implementation(libs.firebase.auth)
+    implementation(libs.firebase.storage)
+    implementation(libs.firebase.firestore)
+    implementation(platform(libs.firebase.bom))
+
     // Test
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+
+    // Modules
+    implementation(project(":core:common"))
 }
