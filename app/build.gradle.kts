@@ -72,4 +72,5 @@ dependencies {
     implementation(project(":feature:home"))
     implementation(project(":core:common"))
     implementation(project(":core:ui"))
+    implementation(project(":core:datastore"))
 }
