@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name" translatable="false">SimpleChat</string>
+
+    <!-- Content descriptions -->
+    <eat-comment />
+    <string name="btn_nav_back_cont_desc">Return to previous screen</string>
+    <string name="ic_clear_cont_desc">Clear text</string>
+    <string name="ic_visibility_cont_desc">Hide password</string>
+    <string name="ic_visibility_off_cont_desc">Show password</string>
+
+    <!-- Notification -->
+    <eat-comment />
+    <string name="notif_chan_worker_id">expedited_work_channel</string>
+    <string name="notif_chan_worker_name">Foreground Worker Channel</string>
+    <string name="notif_chan_worker_desc">Important for the workers to function</string>
+    <string name="notif_compress_image_worker_content">Compressing image</string>
+    <string name="notif_encrypt_image_worker_content">Encrypting image</string>
+    <string name="notif_upload_image_worker_content">Uploading image</string>
+    <string name="notif_send_image_worker_content">Sending image</string>
+
+    <!-- Errors -->
+    <eat-comment />
+    <string name="error_image_is_nsfw">Image is NSFW</string>
+</resources>

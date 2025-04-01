@@ -2,9 +2,6 @@
 <resources>
     <!-- Content descriptions -->
     <eat-comment />
-    <string name="ic_visibility_cont_desc">Hide password</string>
-    <string name="ic_visibility_off_cont_desc">Show password</string>
-    <string name="ic_clear_cont_desc">Clear text</string>
     <string name="btn_nav_back_cont_desc">Return to previous screen</string>
 
     <!-- Text fields -->

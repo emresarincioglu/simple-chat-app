@@ -31,13 +31,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.simplechat.core.common.Result
-import com.example.simplechat.core.ui.theme.SimpleChatTheme
+import com.example.simplechat.core.ui.composable.CleanableOutlinedTextField
+import com.example.simplechat.core.ui.showToast
 import com.example.simplechat.feature.authentication.R
 import com.example.simplechat.feature.authentication.viewmodel.PasswordResetViewModel
 
@@ -57,17 +57,17 @@ fun PasswordResetScreen(
         viewModel.sendPasswordResetEmailResult.collect { result ->
             isLoading = result is Result.Loading
             when (result) {
-                is Result.Error -> Toast.makeText(
-                    context, result.exception.localizedMessage, Toast.LENGTH_SHORT
-                ).show()
+                is Result.Error -> context.showToast(
+                    result.exception.localizedMessage!!, Toast.LENGTH_SHORT
+                )
 
-                Result.Success(true) -> Toast.makeText(
-                    context, R.string.toast_email_sent, Toast.LENGTH_SHORT
-                ).show()
+                Result.Success(true) -> context.showToast(
+                    R.string.toast_email_sent, Toast.LENGTH_SHORT
+                )
 
-                Result.Success(false) -> Toast.makeText(
-                    context, R.string.toast_email_could_not_send, Toast.LENGTH_SHORT
-                ).show()
+                Result.Success(false) -> context.showToast(
+                    R.string.toast_email_could_not_send, Toast.LENGTH_SHORT
+                )
 
                 else -> Unit
             }
@@ -98,8 +98,8 @@ fun PasswordResetScreen(
                 modifier = Modifier.align(Alignment.Center)
             ) {
                 CleanableOutlinedTextField(
-                    value = viewModel.email,
-                    onValueChange = { viewModel.email = it },
+                    text = viewModel.email,
+                    onTextChange = { viewModel.email = it },
                     label = { Text(stringResource(R.string.tf_email_label)) },
                     leadingIcon = { Icon(Icons.Filled.Email, null) },
                     keyboardOptions = KeyboardOptions.Default.copy(
@@ -131,12 +131,4 @@ fun PasswordResetScreen(
 private fun onPopBackStack(navController: NavHostController, viewModel: PasswordResetViewModel) {
     navController.previousBackStackEntry!!.savedStateHandle["email"] = viewModel.email
     navController.popBackStack()
-}
-
-@Preview
-@Composable
-fun PasswordResetScreenPreview() {
-    SimpleChatTheme {
-        PasswordResetScreen(rememberNavController())
-    }
 }

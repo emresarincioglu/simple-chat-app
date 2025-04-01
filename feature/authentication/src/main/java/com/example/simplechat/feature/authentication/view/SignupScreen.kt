@@ -3,6 +3,7 @@ package com.example.simplechat.feature.authentication.view
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -35,16 +36,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.simplechat.core.common.Result
 import com.example.simplechat.core.ui.theme.SimpleChatTheme
+import com.example.simplechat.core.ui.composable.CleanableOutlinedTextField
+import com.example.simplechat.core.ui.composable.PasswordOutlinedTextField
+import com.example.simplechat.core.ui.showToast
 import com.example.simplechat.feature.authentication.R
 import com.example.simplechat.feature.authentication.viewmodel.SignupViewModel
 
@@ -64,15 +68,15 @@ fun SignupScreen(
         viewModel.signupResult.collect { result ->
             isLoading = result is Result.Loading
             when (result) {
-                is Result.Error -> Toast.makeText(
-                    context, result.exception.localizedMessage, Toast.LENGTH_SHORT
-                ).show()
+                is Result.Error -> context.showToast(
+                    result.exception.localizedMessage!!, Toast.LENGTH_SHORT
+                )
 
                 Result.Success(true) -> onNavigateHome()
 
-                Result.Success(false) -> Toast.makeText(
-                    context, R.string.toast_signup_failed, Toast.LENGTH_SHORT
-                ).show()
+                Result.Success(false) -> context.showToast(
+                    R.string.toast_signup_failed, Toast.LENGTH_SHORT
+                )
 
                 else -> Unit
             }
@@ -101,6 +105,7 @@ fun SignupScreen(
 
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(24.dp),
                 modifier = Modifier.align(Alignment.Center)
             ) {
                 InputTextFields(
@@ -108,19 +113,17 @@ fun SignupScreen(
                     modifier = Modifier.width(TextFieldDefaults.MinWidth)
                 )
 
-                AnimatedVisibility(isLoading) {
-                    CircularProgressIndicator(modifier = Modifier.padding(top = 16.dp))
-                }
+                AnimatedVisibility(visible = isLoading) { CircularProgressIndicator() }
 
+                val keyboardController = LocalSoftwareKeyboardController.current
                 Button(
                     onClick = {
                         if (!isLoading) {
                             viewModel.signUp()
+                            keyboardController?.hide()
                         }
                     },
-                    modifier = Modifier
-                        .width(TextFieldDefaults.MinWidth)
-                        .padding(top = 16.dp)
+                    modifier = Modifier.width(TextFieldDefaults.MinWidth)
                 ) {
                     Text(stringResource(R.string.btn_signup_text))
                 }
@@ -130,14 +133,11 @@ fun SignupScreen(
 }
 
 @Composable
-private fun InputTextFields(
-    viewModel: SignupViewModel,
-    modifier: Modifier = Modifier
-) {
+private fun InputTextFields(viewModel: SignupViewModel, modifier: Modifier = Modifier) {
     Column(modifier = modifier) {
         CleanableOutlinedTextField(
-            value = viewModel.name,
-            onValueChange = { viewModel.name = it },
+            text = viewModel.name,
+            onTextChange = { viewModel.name = it },
             label = { Text(stringResource(R.string.tf_full_name_label)) },
             leadingIcon = { Icon(Icons.Filled.Person, null) },
             keyboardOptions = KeyboardOptions.Default.copy(
@@ -147,8 +147,8 @@ private fun InputTextFields(
         )
 
         CleanableOutlinedTextField(
-            value = viewModel.email,
-            onValueChange = { viewModel.email = it },
+            text = viewModel.email,
+            onTextChange = { viewModel.email = it },
             label = { Text(stringResource(R.string.tf_email_label)) },
             leadingIcon = { Icon(Icons.Filled.Email, null) },
             keyboardOptions = KeyboardOptions.Default.copy(
@@ -160,8 +160,8 @@ private fun InputTextFields(
         )
 
         PasswordOutlinedTextField(
-            value = viewModel.password,
-            onValueChange = { viewModel.password = it },
+            password = viewModel.password,
+            onPasswordChange = { viewModel.password = it },
             label = stringResource(R.string.tf_password_label),
             leadingIcon = { Icon(Icons.Filled.Lock, null) },
             modifier = Modifier.fillMaxWidth()
@@ -176,12 +176,4 @@ private fun onPopBackStack(navController: NavHostController, viewModel: SignupVi
     }
 
     navController.popBackStack()
-}
-
-@Preview
-@Composable
-private fun SignupScreenPreview() {
-    SimpleChatTheme {
-        SignupScreen(navController = rememberNavController(), onNavigateHome = {})
-    }
 }

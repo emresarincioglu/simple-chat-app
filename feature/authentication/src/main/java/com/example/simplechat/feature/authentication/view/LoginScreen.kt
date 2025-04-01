@@ -2,8 +2,6 @@ package com.example.simplechat.feature.authentication.view
 
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,15 +10,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -40,15 +35,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.simplechat.core.common.Result
-import com.example.simplechat.core.ui.theme.SimpleChatTheme
+import com.example.simplechat.core.ui.composable.CleanableOutlinedTextField
+import com.example.simplechat.core.ui.composable.PasswordOutlinedTextField
+import com.example.simplechat.core.ui.showToast
 import com.example.simplechat.feature.authentication.R
 import com.example.simplechat.feature.authentication.navigation.NavRoute
 import com.example.simplechat.feature.authentication.viewmodel.LoginViewModel
@@ -77,15 +71,15 @@ fun LoginScreen(
         viewModel.loginResult.collect { result ->
             isLoading = result is Result.Loading
             when (result) {
-                is Result.Error -> Toast.makeText(
-                    context, result.exception.localizedMessage, Toast.LENGTH_SHORT
-                ).show()
+                is Result.Error -> context.showToast(
+                    result.exception.localizedMessage!!, Toast.LENGTH_SHORT
+                )
 
                 Result.Success(true) -> onNavigateHome()
 
-                Result.Success(false) -> Toast.makeText(
-                    context, R.string.toast_login_failed, Toast.LENGTH_SHORT
-                ).show()
+                Result.Success(false) -> context.showToast(
+                    R.string.toast_login_failed, Toast.LENGTH_SHORT
+                )
 
                 else -> Unit
             }
@@ -132,86 +126,6 @@ fun LoginScreen(
 }
 
 @Composable
-fun CleanableOutlinedTextField(
-    value: String,
-    onValueChange: (String) -> Unit,
-    modifier: Modifier = Modifier,
-    label: @Composable (() -> Unit)? = null,
-    placeholder: @Composable (() -> Unit)? = null,
-    leadingIcon: @Composable (() -> Unit)? = null,
-    visualTransformation: VisualTransformation = VisualTransformation.None,
-    keyboardOptions: KeyboardOptions = KeyboardOptions.Default
-) {
-    var hasFocus by remember { mutableStateOf(false) }
-
-    OutlinedTextField(
-        value = value,
-        onValueChange = onValueChange,
-        label = label,
-        placeholder = placeholder,
-        leadingIcon = leadingIcon,
-        trailingIcon = {
-            AnimatedVisibility(
-                visible = hasFocus && value.isNotEmpty(),
-                enter = fadeIn(),
-                exit = fadeOut()
-            ) {
-                IconButton(onClick = { onValueChange("") }) {
-                    Icon(
-                        Icons.Filled.Clear,
-                        contentDescription = stringResource(R.string.ic_clear_cont_desc)
-                    )
-                }
-            }
-        },
-        singleLine = true,
-        visualTransformation = visualTransformation,
-        keyboardOptions = keyboardOptions,
-        modifier = modifier.onFocusChanged { hasFocus = it.isFocused }
-    )
-}
-
-@Composable
-fun PasswordOutlinedTextField(
-    value: String,
-    onValueChange: (String) -> Unit,
-    label: String,
-    modifier: Modifier = Modifier,
-    leadingIcon: @Composable (() -> Unit)? = null
-) {
-    var visible by rememberSaveable { mutableStateOf(false) }
-
-    OutlinedTextField(
-        value = value,
-        onValueChange = onValueChange,
-        label = { Text(label) },
-        leadingIcon = { leadingIcon?.invoke() },
-        trailingIcon = {
-            IconButton(onClick = { visible = !visible }) {
-                if (visible) {
-                    Icon(
-                        painterResource(R.drawable.ic_visibility_24),
-                        contentDescription = stringResource(R.string.ic_visibility_cont_desc)
-                    )
-                } else {
-                    Icon(
-                        painterResource(R.drawable.ic_visibility_off_24),
-                        contentDescription = stringResource(R.string.ic_visibility_off_cont_desc)
-                    )
-                }
-            }
-        },
-        singleLine = true,
-        visualTransformation = if (visible) VisualTransformation.None else PasswordVisualTransformation(),
-        keyboardOptions = KeyboardOptions.Default.copy(
-            keyboardType = KeyboardType.Password,
-            autoCorrectEnabled = false
-        ),
-        modifier = modifier
-    )
-}
-
-@Composable
 private fun InputTextFields(
     viewModel: LoginViewModel,
     onForgetPassword: () -> Unit,
@@ -219,8 +133,8 @@ private fun InputTextFields(
 ) {
     Column(modifier = modifier) {
         CleanableOutlinedTextField(
-            value = viewModel.email,
-            onValueChange = { viewModel.email = it },
+            text = viewModel.email,
+            onTextChange = { viewModel.email = it },
             label = { Text(stringResource(R.string.tf_email_label)) },
             leadingIcon = { Icon(Icons.Filled.Email, null) },
             keyboardOptions = KeyboardOptions.Default.copy(
@@ -232,8 +146,8 @@ private fun InputTextFields(
         )
 
         PasswordOutlinedTextField(
-            value = viewModel.password,
-            onValueChange = { viewModel.password = it },
+            password = viewModel.password,
+            onPasswordChange = { viewModel.password = it },
             label = stringResource(R.string.tf_password_label),
             leadingIcon = { Icon(Icons.Filled.Lock, null) },
             modifier = Modifier.fillMaxWidth()
@@ -263,13 +177,5 @@ private fun AuthButtons(onLogIn: () -> Unit, onSignUp: () -> Unit, modifier: Mod
         ) {
             Text(stringResource(R.string.btn_signup_text))
         }
-    }
-}
-
-@Preview
-@Composable
-private fun LoginScreenPreview() {
-    SimpleChatTheme {
-        LoginScreen(navController = rememberNavController(), onNavigateHome = {})
     }
 }
