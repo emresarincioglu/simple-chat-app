@@ -1,6 +1,4 @@
 <resources>
-    <string name="app_name">SimpleChat</string>
-
     <!-- Screens -->
     <eat-comment />
     <string name="screen_home_title">Home</string>

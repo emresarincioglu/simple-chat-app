@@ -82,5 +82,6 @@ dependencies {
     implementation(project(":core:database"))
     implementation(project(":core:datastore"))
     implementation(project(":data:home"))
+    implementation(project(":data:profile"))
     implementation(project(":data:authentication"))
 }
