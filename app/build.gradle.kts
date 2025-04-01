@@ -68,9 +68,10 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
 
     // Modules
-    implementation(project(":feature:authentication"))
     implementation(project(":feature:home"))
-    implementation(project(":core:common"))
+    implementation(project(":feature:authentication"))
     implementation(project(":core:ui"))
+    implementation(project(":core:crypto"))
+    implementation(project(":core:common"))
     implementation(project(":core:datastore"))
 }
