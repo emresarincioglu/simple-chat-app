@@ -52,11 +52,16 @@ dependencies {
 
     // Hilt
     implementation(libs.dagger.hilt.android)
+    implementation(libs.androidx.hilt.work)
     kapt(libs.dagger.hilt.compiler)
 
     // Navigation
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.hilt.navigation.compose)
+
+    // Coil
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network)
 
     // Test
     testImplementation(libs.junit)
@@ -76,4 +81,5 @@ dependencies {
     implementation(project(":core:network"))
     implementation(project(":core:database"))
     implementation(project(":core:datastore"))
+    implementation(project(":data:authentication"))
 }
