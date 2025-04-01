@@ -1,8 +1,7 @@
 package com.example.simplechat.core.common
 
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
+import java.util.concurrent.TimeoutException
 
 sealed class Result<out T> {
     data class Success<out T>(val data: T) : Result<T>()
@@ -10,15 +9,17 @@ sealed class Result<out T> {
     data object Loading : Result<Nothing>()
 }
 
-suspend fun <T> safeCall(
-    dispatcher: CoroutineDispatcher = Dispatchers.Main,
-    call: suspend () -> Result<T>
-): Result<T> {
-    return try {
-        withContext(dispatcher) {
-            call()
-        }
-    } catch (e: Throwable) {
-        Result.Error(e)
+/**
+ * @param timeout Action timeout as milliseconds
+ */
+suspend fun <T> safeCall(timeout: Long? = null, call: suspend () -> T) = try {
+    if (timeout == null) {
+        Result.Success(call())
+    } else {
+        withTimeoutOrNull(timeMillis = timeout) {
+            Result.Success(call())
+        } ?: Result.Error(TimeoutException("Action timed out."))
     }
+} catch (ex: Throwable) {
+    Result.Error(ex)
 }

@@ -8,7 +8,7 @@ plugins {
 
 android {
     namespace = "com.example.simplechat"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.example.simplechat"
