@@ -1,7 +1,6 @@
 package com.example.simplechat.feature.authentication.view
 
 import android.widget.Toast
-import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -9,12 +8,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -26,17 +23,15 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.example.simplechat.core.common.Result
 import com.example.simplechat.core.ui.composable.CleanableOutlinedTextField
+import com.example.simplechat.core.ui.composable.NavigateBackButton
 import com.example.simplechat.core.ui.showToast
 import com.example.simplechat.feature.authentication.R
 import com.example.simplechat.feature.authentication.viewmodel.PasswordResetViewModel
@@ -44,14 +39,12 @@ import com.example.simplechat.feature.authentication.viewmodel.PasswordResetView
 
 @Composable
 fun PasswordResetScreen(
-    navController: NavHostController,
+    onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: PasswordResetViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
     var isLoading by rememberSaveable { mutableStateOf(false) }
-
-    BackHandler { onPopBackStack(navController, viewModel) }
 
     LaunchedEffect(Unit) {
         viewModel.sendPasswordResetEmailResult.collect { result ->
@@ -80,18 +73,11 @@ fun PasswordResetScreen(
                 .fillMaxSize()
                 .padding(paddings)
         ) {
-            IconButton(
-                onClick = { onPopBackStack(navController, viewModel) },
-                modifier = Modifier
-                    .alpha(0.6f)
-                    .align(Alignment.TopStart)
-            ) {
-                Icon(
-                    Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = stringResource(R.string.btn_nav_back_cont_desc),
-                    tint = MaterialTheme.colorScheme.onBackground
-                )
-            }
+            NavigateBackButton(
+                onNavigateBack = onNavigateBack,
+                handleSystemBackButton = true,
+                tint = MaterialTheme.colorScheme.onBackground
+            )
 
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,

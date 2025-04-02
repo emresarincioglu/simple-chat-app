@@ -18,13 +18,40 @@
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:theme="@style/Theme.SimpleChat">
-
+            android:launchMode="singleInstance"
+            android:theme="@style/Theme.SimpleChat.Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
+            <!-- Friend Code Deep Link Intent Filter -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="com.example.simplechat"
+                    android:pathPrefix="/share"
+                    android:scheme="android-app" />
+            </intent-filter>
         </activity>
+
+        <!-- Trigger Google Play services to install the backported photo picker module -->
+        <service
+            android:name="com.google.android.gms.metadata.ModuleDependencies"
+            android:enabled="false"
+            android:exported="false"
+            tools:ignore="MissingClass">
+            <intent-filter>
+                <action android:name="com.google.android.gms.metadata.MODULE_DEPENDENCIES" />
+            </intent-filter>
+            <meta-data
+                android:name="photopicker_activity:0:required"
+                android:value="" />
+        </service>
 
         <!-- Disable WorkManagerInitializer -->
         <provider
@@ -37,6 +64,9 @@
                 android:value="androidx.startup"
                 tools:node="remove" />
         </provider>
-    </application>
 
+        <meta-data
+            android:name="com.google.mlkit.vision.DEPENDENCIES"
+            android:value="barcode_ui" />
+    </application>
 </manifest>

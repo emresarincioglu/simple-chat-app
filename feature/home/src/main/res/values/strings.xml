@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Content Descriptions -->
+    <eat-comment />
+    <string name="btn_send_message_cont_desc">Send message</string>
+    <string name="btn_send_image_message_cont_desc">Send image</string>
+    <string name="btn_add_friend_cont_desc">Add friend</string>
+    <string name="btn_delete_friend_cont_desc">Delete friend</string>
+    <string name="iv_friend_code_cont_desc">User\'s friend code qr</string>
+    <string name="btn_scan_friend_qr_code_cont_desc">Scan friend qr code</string>
+
+    <!-- Text Fields -->
+    <eat-comment />
+    <string name="tf_message_placeholder">Write your message</string>
+    <string name="tf_friend_code_label">Friend code</string>
+
+    <!-- Buttons -->
+    <eat-comment />
+    <string name="btn_add_friend_text">Add Friend</string>
+
+    <!-- Screens -->
+    <eat-comment />
+    <string name="screen_add_friend_title">Add Friend</string>
+
+    <!-- Dialogs -->
+    <eat-comment />
+    <string name="dialog_share_friend_code_title">Share Friend Code</string>
+    <string name="dialog_confirm_delete_friend_title">Delete friend</string>
+    <string name="dialog_confirm_delete_friend_text">Do you want to delete your friend? You won\'t be able to access your messages.</string>
+</resources>

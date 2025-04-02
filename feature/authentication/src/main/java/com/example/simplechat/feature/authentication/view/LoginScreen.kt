@@ -24,50 +24,36 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.example.simplechat.core.common.Result
 import com.example.simplechat.core.ui.composable.CleanableOutlinedTextField
 import com.example.simplechat.core.ui.composable.PasswordOutlinedTextField
 import com.example.simplechat.core.ui.showToast
 import com.example.simplechat.feature.authentication.R
-import com.example.simplechat.feature.authentication.navigation.NavRoute
 import com.example.simplechat.feature.authentication.viewmodel.LoginViewModel
 
 @Composable
 fun LoginScreen(
-    navController: NavHostController,
-    viewModel: LoginViewModel = hiltViewModel(),
     onNavigateHome: () -> Unit,
-    modifier: Modifier = Modifier
+    onNavigateSignup: () -> Unit,
+    onNavigatePasswordReset: () -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: LoginViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
     var isLoading by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
-        with(navController.currentBackStackEntry!!.savedStateHandle) {
-            remove<String>("email")?.let {
-                viewModel.email = it
-            }
-
-            remove<String>("password")?.let {
-                viewModel.password = it
-            }
-        }
-
         viewModel.loginResult.collect { result ->
             isLoading = result is Result.Loading
             when (result) {
@@ -97,7 +83,7 @@ fun LoginScreen(
             InputTextFields(
                 viewModel = viewModel,
                 onForgetPassword = {
-                    navController.navigate("${NavRoute.PasswordResetScreen.route}/${viewModel.email}")
+                    onNavigatePasswordReset()
                 },
                 modifier = Modifier.width(TextFieldDefaults.MinWidth)
             )
@@ -113,9 +99,7 @@ fun LoginScreen(
                     }
                 },
                 onSignUp = {
-                    navController.navigate(
-                        "${NavRoute.SignupScreen.route}/${viewModel.email}/${viewModel.password}"
-                    )
+                    onNavigateSignup()
                 },
                 modifier = Modifier
                     .width(TextFieldDefaults.MinWidth)
@@ -164,8 +148,15 @@ private fun InputTextFields(
 
 @Composable
 private fun AuthButtons(onLogIn: () -> Unit, onSignUp: () -> Unit, modifier: Modifier = Modifier) {
+    val keyboardController = LocalSoftwareKeyboardController.current
     Column(modifier = modifier) {
-        Button(onClick = onLogIn, modifier = Modifier.fillMaxWidth()) {
+        Button(
+            onClick = {
+                onLogIn()
+                keyboardController?.hide()
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
             Text(stringResource(R.string.btn_login_text))
         }
 

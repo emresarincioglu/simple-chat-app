@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.kapt)
     alias(libs.plugins.dagger.hilt.android)
+    alias(libs.plugins.google.gms)
 }
 
 android {
@@ -62,6 +63,9 @@ dependencies {
     // Coil
     implementation(libs.coil.compose)
     implementation(libs.coil.network)
+
+    // Splash Screen
+    implementation(libs.androidx.core.splashscreen)
 
     // Test
     testImplementation(libs.junit)

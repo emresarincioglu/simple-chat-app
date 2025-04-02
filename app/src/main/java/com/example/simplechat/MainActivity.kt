@@ -4,23 +4,33 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.ui.Modifier
-import androidx.navigation.compose.rememberNavController
+import androidx.activity.viewModels
+import androidx.compose.runtime.getValue
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.simplechat.core.ui.theme.SimpleChatTheme
-import com.example.simplechat.navigation.navhost.MainNavHost
+import com.example.simplechat.view.MainScreen
+import com.example.simplechat.viewmodel.SplashViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    private val viewModel by viewModels<SplashViewModel>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+        val splashScreen = installSplashScreen()
         enableEdgeToEdge()
+        super.onCreate(savedInstanceState)
+
+        splashScreen.setKeepOnScreenCondition { !viewModel.isAppInitializedStream.value }
 
         setContent {
             SimpleChatTheme {
-                val navController = rememberNavController()
-                MainNavHost(navController = navController, modifier = Modifier.fillMaxSize())
+                val isInitialized by viewModel.isAppInitializedStream.collectAsStateWithLifecycle()
+                if (isInitialized) {
+                    MainScreen()
+                }
             }
         }
     }

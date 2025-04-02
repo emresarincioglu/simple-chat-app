@@ -55,6 +55,17 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.hilt.navigation.compose)
 
+    // Coil
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network)
+
+    // Paging
+    implementation(libs.androidx.paging.runtime)
+    implementation(libs.androidx.paging.compose)
+
+    // Qr Scanner
+    implementation(libs.google.gms.code.scanner)
+
     // Test
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
@@ -65,10 +76,8 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
 
     // Modules
-    implementation(project(":core:common"))
     implementation(project(":core:ui"))
-
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
+    implementation(project(":core:common"))
+    implementation(project(":domain:home"))
+    implementation(project(":domain:profile"))
 }

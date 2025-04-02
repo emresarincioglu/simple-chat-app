@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Content descriptions -->
-    <eat-comment />
-    <string name="btn_nav_back_cont_desc">Return to previous screen</string>
-
     <!-- Text fields -->
     <eat-comment />
     <string name="tf_email_label">Email</string>
