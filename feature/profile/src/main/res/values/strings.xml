@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Errors -->
+    <eat-comment />
+    <string name="error_blank_input">This area cannot be blank</string>
+    <string name="error_blank_inputs">Fields cannot be blank</string>
+    <string name="error_inputs_not_match">Fields do not match</string>
+
+    <!-- Dialogs -->
+    <eat-comment />
+    <string name="dialog_change_name_title">Change name</string>
+    <string name="dialog_change_passwd_title">Change password</string>
+    <string name="dialog_confirm_delete_user_title">Delete user</string>
+    <string name="dialog_confirm_delete_user_text">Do you want to delete your account? This process is irreversible.</string>
+
+    <!-- Text Fields -->
+    <eat-comment />
+    <string name="tf_passwd_placeholder">New password</string>
+    <string name="tf_confirm_passwd_placeholder">Confirm password</string>
+
+    <!-- Screens -->
+    <eat-comment />
+    <string name="screen_profile_title">Profile</string>
+
+    <!-- Content Descriptions -->
+    <eat-comment />
+    <string name="btn_menu_cont_desc">Show menu</string>
+    <string name="btn_pick_photo_cont_desc">Pick an image from gallery</string>
+
+    <!-- Menu items -->
+    <eat-comment />
+    <string name="menu_item_sign_out">Sign out</string>
+    <string name="menu_item_change_passwd">Change password</string>
+    <string name="menu_item_delete_account">Delete account</string>
+
+    <!-- Toasts -->
+    <eat-comment />
+    <string name="toast_passwd_changed">Password changed successfully</string>
+    <string name="toast_passwd_change_failed">Password change failed</string>
+    <string name="toast_account_delete_failed">Account could not be deleted</string>
+    <string name="toast_logout_failed">Logout failed.</string>
+
+    <!-- Preferences -->
+    <eat-comment />
+    <string name="name">Name</string>
+    <string name="name_desc">The name that other users will see. Click to change.</string>
+    <string name="email">Email</string>
+    <string name="email_desc">The email used to log in.</string>
+</resources>

@@ -22,6 +22,7 @@ dependencyResolutionManagement {
 rootProject.name = "SimpleChat"
 include(":app")
 include(":feature:home")
+include(":feature:profile")
 include(":feature:authentication")
 include(":core:ui")
 include(":core:common")

@@ -1,24 +1,20 @@
 plugins {
-    alias(libs.plugins.android.application)
+    alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.kapt)
     alias(libs.plugins.dagger.hilt.android)
-    alias(libs.plugins.google.gms)
 }
 
 android {
-    namespace = "com.example.simplechat"
+    namespace = "com.example.simplechat.feature.profile"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.example.simplechat"
         minSdk = 24
-        targetSdk = 34
-        versionCode = 1
-        versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles("consumer-rules.pro")
     }
 
     buildTypes {
@@ -53,7 +49,6 @@ dependencies {
 
     // Hilt
     implementation(libs.dagger.hilt.android)
-    implementation(libs.androidx.hilt.work)
     kapt(libs.dagger.hilt.compiler)
 
     // Navigation
@@ -63,9 +58,6 @@ dependencies {
     // Coil
     implementation(libs.coil.compose)
     implementation(libs.coil.network)
-
-    // Splash Screen
-    implementation(libs.androidx.core.splashscreen)
 
     // Test
     testImplementation(libs.junit)
@@ -77,19 +69,7 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
 
     // Modules
-    implementation(project(":feature:home"))
-    implementation(project(":feature:profile"))
-    implementation(project(":feature:authentication"))
     implementation(project(":core:ui"))
-    implementation(project(":core:crypto"))
     implementation(project(":core:common"))
-    implementation(project(":core:network"))
-    implementation(project(":core:database"))
-    implementation(project(":core:datastore"))
-    implementation(project(":domain:home"))
     implementation(project(":domain:profile"))
-    implementation(project(":domain:authentication"))
-    implementation(project(":data:home"))
-    implementation(project(":data:profile"))
-    implementation(project(":data:authentication"))
 }

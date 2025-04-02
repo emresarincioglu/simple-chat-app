@@ -7,6 +7,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import com.example.simplechat.navigation.graph.HomeNavGraph
+import com.example.simplechat.navigation.graph.ProfileNavGraph
 import com.example.simplechat.navigation.route.NavigationRoute
 
 @Composable
@@ -24,4 +25,6 @@ fun BottomBarNavHost(
         parentNavController = parentNavController,
         modifier = modifier
     )
+
+    ProfileNavGraph(parentNavController = parentNavController, modifier = modifier)
 }
