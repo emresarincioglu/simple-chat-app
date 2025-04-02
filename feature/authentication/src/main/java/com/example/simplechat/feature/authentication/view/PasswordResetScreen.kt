@@ -113,8 +113,3 @@ fun PasswordResetScreen(
         }
     }
 }
-
-private fun onPopBackStack(navController: NavHostController, viewModel: PasswordResetViewModel) {
-    navController.previousBackStackEntry!!.savedStateHandle["email"] = viewModel.email
-    navController.popBackStack()
-}

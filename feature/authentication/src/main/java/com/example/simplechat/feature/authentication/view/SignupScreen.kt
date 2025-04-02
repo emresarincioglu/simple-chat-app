@@ -153,12 +153,3 @@ private fun InputTextFields(viewModel: SignupViewModel, modifier: Modifier = Mod
         )
     }
 }
-
-private fun onPopBackStack(navController: NavHostController, viewModel: SignupViewModel) {
-    with(navController.previousBackStackEntry!!) {
-        savedStateHandle["email"] = viewModel.email
-        savedStateHandle["password"] = viewModel.password
-    }
-
-    navController.popBackStack()
-}

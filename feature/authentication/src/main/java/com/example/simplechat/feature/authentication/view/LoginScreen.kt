@@ -83,6 +83,7 @@ fun LoginScreen(
             InputTextFields(
                 viewModel = viewModel,
                 onForgetPassword = {
+                    viewModel.cancelRunningActions()
                     onNavigatePasswordReset()
                 },
                 modifier = Modifier.width(TextFieldDefaults.MinWidth)
@@ -99,6 +100,7 @@ fun LoginScreen(
                     }
                 },
                 onSignUp = {
+                    viewModel.cancelRunningActions()
                     onNavigateSignup()
                 },
                 modifier = Modifier
