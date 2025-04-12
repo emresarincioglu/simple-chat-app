@@ -30,13 +30,11 @@ class UserRemoteDataSource @Inject constructor(
     private val storage: FirebaseStorage
 ) {
 
-    private val user get() = auth.currentUser!!
-
     fun getUserEmail() = auth.currentUser!!.email!!
 
     suspend fun getUserId() = db.collection(COLLECTION_USERS)
         .whereEqualTo(FIELD_IS_ACTIVE, true)
-        .whereEqualTo(FIELD_EMAIL, user.email!!)
+        .whereEqualTo(FIELD_EMAIL, getUserEmail())
         .limit(1)
         .get().await()
         .documents[0]
@@ -44,11 +42,11 @@ class UserRemoteDataSource @Inject constructor(
         .id
 
     suspend fun getUserCryptoData(userId: String): CryptoKeysWithIv {
-        val userDoc = db.document("$COLLECTION_USERS/$userId").get().await()
+        val document = db.document("$COLLECTION_USERS/$userId").get().await()
         return CryptoKeysWithIv(
-            iv = userDoc.getString(FIELD_IV)!!,
-            privateKey = userDoc.getString(FIELD_PRIVATE_KEY)!!,
-            publicKey = userDoc.getString(FIELD_PUBLIC_KEY)!!
+            iv = document.getString(FIELD_IV)!!,
+            privateKey = document.getString(FIELD_PRIVATE_KEY)!!,
+            publicKey = document.getString(FIELD_PUBLIC_KEY)!!
         )
     }
 
@@ -86,7 +84,7 @@ class UserRemoteDataSource @Inject constructor(
 
     suspend fun deleteUser(userId: String): Boolean {
         val userRef = db.document("$COLLECTION_USERS/$userId")
-        val isSuccessful = user.delete().awaitSuccessResult()
+        val isSuccessful = auth.currentUser!!.delete().awaitSuccessResult()
         if (isSuccessful) {
             userRef.update(FIELD_IS_ACTIVE, false).await()
         }
@@ -95,13 +93,10 @@ class UserRemoteDataSource @Inject constructor(
     }
 
     suspend fun setUserPassword(
-        userId: String,
-        password: String,
-        privateKey: String,
-        iv: String
+        userId: String, password: String, privateKey: String, iv: String
     ): Boolean {
         val userRef = db.document("$COLLECTION_USERS/$userId")
-        val isSuccessful = user.updatePassword(password).awaitSuccessResult()
+        val isSuccessful = auth.currentUser!!.updatePassword(password).awaitSuccessResult()
 
         if (isSuccessful) {
             userRef.update(mapOf(FIELD_PRIVATE_KEY to privateKey, FIELD_IV to iv))

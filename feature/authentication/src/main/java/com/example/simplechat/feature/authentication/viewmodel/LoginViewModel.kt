@@ -33,7 +33,9 @@ class LoginViewModel @Inject constructor(private val logInUseCase: LogInUseCase)
     fun logIn() {
         loginJob = viewModelScope.launch {
             _loginResult.emit(Result.Loading)
-            _loginResult.emit(safeCall(ACTION_TIMEOUT) { logInUseCase(email, password) })
+            _loginResult.emit(
+                safeCall(ACTION_TIMEOUT) { logInUseCase(email.trim(), password.trim()) }
+            )
         }
     }
 

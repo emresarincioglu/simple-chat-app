@@ -34,7 +34,7 @@ class PasswordResetViewModel @Inject constructor(
         viewModelScope.launch {
             _sendPasswordResetEmailResult.emit(Result.Loading)
             _sendPasswordResetEmailResult.emit(safeCall(ACTION_TIMEOUT) {
-                sendPasswordResetEmailUseCase(email)
+                sendPasswordResetEmailUseCase(email.trim())
             })
         }
     }

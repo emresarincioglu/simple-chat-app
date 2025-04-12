@@ -35,7 +35,9 @@ class SignupViewModel @Inject constructor(
         viewModelScope.launch {
             _signupResult.emit(Result.Loading)
             _signupResult.emit(
-                safeCall(ACTION_TIMEOUT) { signUpUseCase(name, email, password) }
+                safeCall(ACTION_TIMEOUT) {
+                    signUpUseCase(name.trim(), email.trim(), password.trim())
+                }
             )
         }
     }

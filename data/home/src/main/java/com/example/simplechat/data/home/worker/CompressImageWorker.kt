@@ -7,10 +7,14 @@ import android.content.Context
 import android.content.pm.ServiceInfo
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Matrix
+import android.net.Uri
 import android.os.Build
+import android.provider.MediaStore
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.graphics.scale
 import androidx.core.net.toUri
 import androidx.work.CoroutineWorker
 import androidx.work.Data
@@ -28,15 +32,15 @@ class CompressImageWorker(context: Context, workerParams: WorkerParameters) :
 
     companion object {
         private const val NOTIFICATION_ID = 3
+        private const val MAX_IMAGE_RESOLUTION = 720
         private const val MAX_IMAGE_SIZE = 100 * 1024L
     }
 
     override suspend fun doWork(): Result {
-        val contentResolver = applicationContext.contentResolver
         val imageUri = inputData.getString(DATA_IMAGE_URI)!!.toUri()
 
         return try {
-            val mimeType = contentResolver.getType(imageUri)
+            val mimeType = applicationContext.contentResolver.getType(imageUri)
             val (compressFormat, fileExtension) = when (mimeType) {
                 "image/png" -> Bitmap.CompressFormat.PNG to ".png"
                 "image/jpeg" -> Bitmap.CompressFormat.JPEG to ".jpeg"
@@ -47,35 +51,77 @@ class CompressImageWorker(context: Context, workerParams: WorkerParameters) :
                 else -> Bitmap.CompressFormat.JPEG to ".jpeg"
             }
 
-            val image = contentResolver.openInputStream(imageUri).use { inStream ->
-                BitmapFactory.decodeStream(inStream)
-            }!!
-
-            val compressedImageFile = applicationContext.createTempFile(fileExtension)
+            var image = getImage(imageUri) ?: return Result.failure()
+            image = scaleImage(image)
+            image = rotateImage(imageUri, image)
+            val compressedImageFileName = compressImage(image, compressFormat, fileExtension)
                 ?: return Result.failure()
-
-            var quality = 70
-            var imageBytes: ByteArray
-            do {
-                ByteArrayOutputStream().use { outStream ->
-                    image.compress(compressFormat, quality, outStream)
-                    imageBytes = outStream.toByteArray()
-                }
-                quality = (quality * 0.9).roundToInt()
-            } while (imageBytes.size > MAX_IMAGE_SIZE && quality > 5 && compressFormat != Bitmap.CompressFormat.PNG)
-
-            compressedImageFile.outputStream().use { outStream ->
-                outStream.write(imageBytes, 0, imageBytes.size)
-            }
 
             Result.success(
                 Data.Builder()
-                    .putString(DATA_COMPRESSED_IMAGE_FILE_NAME, compressedImageFile.name)
+                    .putString(DATA_COMPRESSED_IMAGE_FILE_NAME, compressedImageFileName)
                     .build()
             )
         } catch (ex: Exception) {
             Result.failure()
         }
+    }
+
+    private fun getImage(uri: Uri): Bitmap? {
+        return applicationContext.contentResolver.openInputStream(uri).use { inStream ->
+            BitmapFactory.decodeStream(inStream)
+        }
+    }
+
+    private fun scaleImage(image: Bitmap): Bitmap {
+        val scaledImage = image.scale(
+            image.width.coerceAtMost(MAX_IMAGE_RESOLUTION),
+            image.height.coerceAtMost(MAX_IMAGE_RESOLUTION)
+        )
+
+        image.recycle()
+        return scaledImage
+    }
+
+    private fun rotateImage(uri: Uri, image: Bitmap): Bitmap {
+        var orientation = 0
+        val columns = arrayOf(MediaStore.Images.Media.ORIENTATION)
+
+        applicationContext.contentResolver.query(uri, columns, null, null, null).use { cursor ->
+            if (cursor?.moveToFirst() == true) {
+                orientation = cursor.getInt(0)
+            }
+        }
+        if (orientation == 0) return image
+
+        val matrix = Matrix()
+        matrix.postRotate(orientation.toFloat())
+        val rotatedImage = Bitmap.createBitmap(image, 0, 0, image.width, image.height, matrix, true)
+
+        image.recycle()
+        return rotatedImage
+    }
+
+    private fun compressImage(
+        image: Bitmap, format: Bitmap.CompressFormat, fileExtension: String
+    ): String? {
+        val compressedImageFile = applicationContext.createTempFile(fileExtension) ?: return null
+
+        var quality = 80
+        var imageBytes: ByteArray
+        do {
+            ByteArrayOutputStream().use { outStream ->
+                image.compress(format, quality, outStream)
+                imageBytes = outStream.toByteArray()
+            }
+            quality = (quality * 0.9).roundToInt()
+        } while (imageBytes.size > MAX_IMAGE_SIZE && quality > 5 && format != Bitmap.CompressFormat.PNG)
+
+        compressedImageFile.outputStream().use { outStream ->
+            outStream.write(imageBytes, 0, imageBytes.size)
+        }
+
+        return compressedImageFile.name
     }
 
     override suspend fun getForegroundInfo() = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {

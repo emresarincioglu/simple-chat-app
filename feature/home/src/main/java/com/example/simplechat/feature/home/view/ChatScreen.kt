@@ -369,6 +369,7 @@ private fun MessageBottomBar(viewModel: ChatViewModel, modifier: Modifier = Modi
                 val imagePicker = rememberLauncherForActivityResult(PickVisualMedia()) { uri ->
                     uri?.let {
                         if (viewModel.isImageSafe(uri)) {
+                            // TODO: Add image send indicator
                             viewModel.sendImage(uri)
                         } else {
                             context.showToast(

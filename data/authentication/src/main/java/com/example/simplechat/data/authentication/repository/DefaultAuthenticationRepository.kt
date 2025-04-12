@@ -11,6 +11,7 @@ import com.example.simplechat.core.network.model.CryptoKeysWithIv
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -48,6 +49,7 @@ class DefaultAuthenticationRepository @Inject constructor(
         val isSuccessful = remoteAuth.logIn(email, password)
 
         if (isSuccessful) {
+            delay(50)
             remoteUserId = remoteUser.getUserId()
             val cryptoData = remoteUser.getUserCryptoData(remoteUserId!!)
 
