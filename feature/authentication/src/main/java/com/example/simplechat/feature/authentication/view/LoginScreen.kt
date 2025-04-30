@@ -81,7 +81,10 @@ fun LoginScreen(
                 .padding(paddings)
         ) {
             InputTextFields(
-                viewModel = viewModel,
+                email = viewModel.email,
+                onEmailChanged = { viewModel.email = it },
+                password = viewModel.password,
+                onPasswordChanged = { viewModel.password = it },
                 onForgetPassword = {
                     viewModel.cancelRunningActions()
                     onNavigatePasswordReset()
@@ -113,38 +116,39 @@ fun LoginScreen(
 
 @Composable
 private fun InputTextFields(
-    viewModel: LoginViewModel,
+    email: String,
+    onEmailChanged: (String) -> Unit,
+    password: String,
+    onPasswordChanged: (String) -> Unit,
     onForgetPassword: () -> Unit,
     modifier: Modifier = Modifier
-) {
-    Column(modifier = modifier) {
-        CleanableOutlinedTextField(
-            text = viewModel.email,
-            onTextChange = { viewModel.email = it },
-            label = { Text(stringResource(R.string.tf_email_label)) },
-            leadingIcon = { Icon(Icons.Filled.Email, null) },
-            keyboardOptions = KeyboardOptions.Default.copy(
-                capitalization = KeyboardCapitalization.None,
-                autoCorrectEnabled = false,
-                keyboardType = KeyboardType.Email
-            ),
-            modifier = Modifier.fillMaxWidth()
-        )
+) = Column(modifier = modifier) {
+    CleanableOutlinedTextField(
+        text = email,
+        onTextChange = onEmailChanged,
+        label = { Text(stringResource(R.string.tf_email_label)) },
+        leadingIcon = { Icon(Icons.Filled.Email, null) },
+        keyboardOptions = KeyboardOptions.Default.copy(
+            capitalization = KeyboardCapitalization.None,
+            keyboardType = KeyboardType.Email,
+            autoCorrectEnabled = false
+        ),
+        modifier = Modifier.fillMaxWidth()
+    )
 
-        PasswordOutlinedTextField(
-            password = viewModel.password,
-            onPasswordChange = { viewModel.password = it },
-            label = stringResource(R.string.tf_password_label),
-            leadingIcon = { Icon(Icons.Filled.Lock, null) },
-            modifier = Modifier.fillMaxWidth()
-        )
+    PasswordOutlinedTextField(
+        password = password,
+        onPasswordChange = onPasswordChanged,
+        label = stringResource(R.string.tf_password_label),
+        leadingIcon = { Icon(Icons.Filled.Lock, null) },
+        modifier = Modifier.fillMaxWidth()
+    )
 
-        TextButton(
-            onClick = onForgetPassword,
-            modifier = Modifier.align(Alignment.End)
-        ) {
-            Text(stringResource(R.string.btn_forget_password_text))
-        }
+    TextButton(
+        onClick = onForgetPassword,
+        modifier = Modifier.align(Alignment.End)
+    ) {
+        Text(stringResource(R.string.btn_forget_password_text))
     }
 }
 

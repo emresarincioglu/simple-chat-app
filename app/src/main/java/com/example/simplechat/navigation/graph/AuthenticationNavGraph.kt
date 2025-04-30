@@ -71,8 +71,7 @@ fun NavGraphBuilder.AuthenticationNavGraph(
         val viewModel = hiltViewModel<PasswordResetViewModel>()
         PasswordResetScreen(
             onNavigateBack = {
-                val savedStateHandle = navController.previousBackStackEntry!!.savedStateHandle
-                savedStateHandle["email"] = viewModel.email
+                navController.previousBackStackEntry!!.savedStateHandle["email"] = viewModel.email
                 navController.popBackStack()
             }
         )

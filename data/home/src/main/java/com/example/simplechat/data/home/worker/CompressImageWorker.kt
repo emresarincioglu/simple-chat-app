@@ -79,7 +79,7 @@ class CompressImageWorker(context: Context, workerParams: WorkerParameters) :
             image.height.coerceAtMost(MAX_IMAGE_RESOLUTION)
         )
 
-        image.recycle()
+        if (scaledImage != image) image.recycle()
         return scaledImage
     }
 

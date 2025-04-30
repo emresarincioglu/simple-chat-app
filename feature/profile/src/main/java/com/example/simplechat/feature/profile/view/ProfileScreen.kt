@@ -73,6 +73,7 @@ import com.example.simplechat.core.ui.composable.PasswordTextField
 import com.example.simplechat.core.ui.showToast
 import com.example.simplechat.feature.profile.R
 import com.example.simplechat.feature.profile.viewmodel.ProfileViewModel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import com.example.simplechat.core.ui.R as coreUiR
 
@@ -84,7 +85,12 @@ fun ProfileScreen(
     viewModel: ProfileViewModel = hiltViewModel()
 ) {
     var dialogType by remember { mutableStateOf(ProfileScreenDialogType.HIDDEN) }
-    ObserveActionResults(onLogOut, viewModel)
+    ObserveActionResults(
+        onLogOut = onLogOut,
+        changePasswordResultStream = viewModel.changePasswordResultStream,
+        deleteUserResultStream = viewModel.deleteUserResultStream,
+        logOutResultStream = viewModel.logOutResultStream
+    )
 
     Scaffold(
         topBar = {
@@ -461,11 +467,16 @@ private fun PickAvatarButton(avatar: Any?, onPick: (Uri?) -> Unit, modifier: Mod
 }
 
 @Composable
-private fun ObserveActionResults(onLogOut: () -> Unit, viewModel: ProfileViewModel) {
+private fun ObserveActionResults(
+    onLogOut: () -> Unit,
+    changePasswordResultStream: Flow<Result<Boolean>>,
+    deleteUserResultStream: Flow<Result<Boolean>>,
+    logOutResultStream: Flow<Result<Boolean>>
+) {
     val context = LocalContext.current
     LaunchedEffect(Unit) {
         launch {
-            viewModel.changePasswordResultStream.collect { result ->
+            changePasswordResultStream.collect { result ->
                 when (result) {
                     is Result.Error -> context.showToast(
                         result.exception.localizedMessage!!, Toast.LENGTH_SHORT
@@ -485,7 +496,7 @@ private fun ObserveActionResults(onLogOut: () -> Unit, viewModel: ProfileViewMod
         }
 
         launch {
-            viewModel.deleteUserResultStream.collect { result ->
+            deleteUserResultStream.collect { result ->
                 when (result) {
                     is Result.Error -> context.showToast(
                         result.exception.localizedMessage!!, Toast.LENGTH_SHORT
@@ -502,7 +513,7 @@ private fun ObserveActionResults(onLogOut: () -> Unit, viewModel: ProfileViewMod
             }
         }
 
-        viewModel.logOutResultStream.collect { result ->
+        logOutResultStream.collect { result ->
             when (result) {
                 is Result.Error -> context.showToast(
                     result.exception.localizedMessage!!, Toast.LENGTH_SHORT

@@ -94,7 +94,12 @@ fun SignupScreen(
                 modifier = Modifier.align(Alignment.Center)
             ) {
                 InputTextFields(
-                    viewModel = viewModel,
+                    name = viewModel.name,
+                    onNameChanged = { viewModel.name = it },
+                    email = viewModel.email,
+                    onEmailChanged = { viewModel.email = it },
+                    password = viewModel.password,
+                    onPasswordChanged = { viewModel.password = it },
                     modifier = Modifier.width(TextFieldDefaults.MinWidth)
                 )
 
@@ -118,38 +123,44 @@ fun SignupScreen(
 }
 
 @Composable
-private fun InputTextFields(viewModel: SignupViewModel, modifier: Modifier = Modifier) {
-    Column(modifier = modifier) {
-        CleanableOutlinedTextField(
-            text = viewModel.name,
-            onTextChange = { viewModel.name = it },
-            label = { Text(stringResource(R.string.tf_full_name_label)) },
-            leadingIcon = { Icon(Icons.Filled.Person, null) },
-            keyboardOptions = KeyboardOptions.Default.copy(
-                capitalization = KeyboardCapitalization.Words, autoCorrectEnabled = false
-            ),
-            modifier = Modifier.fillMaxWidth()
-        )
+private fun InputTextFields(
+    name: String,
+    onNameChanged: (String) -> Unit,
+    email: String,
+    onEmailChanged: (String) -> Unit,
+    password: String,
+    onPasswordChanged: (String) -> Unit,
+    modifier: Modifier = Modifier
+) = Column(modifier = modifier) {
+    CleanableOutlinedTextField(
+        text = name,
+        onTextChange = onNameChanged,
+        label = { Text(stringResource(R.string.tf_full_name_label)) },
+        leadingIcon = { Icon(Icons.Filled.Person, null) },
+        keyboardOptions = KeyboardOptions.Default.copy(
+            capitalization = KeyboardCapitalization.Words, autoCorrectEnabled = false
+        ),
+        modifier = Modifier.fillMaxWidth()
+    )
 
-        CleanableOutlinedTextField(
-            text = viewModel.email,
-            onTextChange = { viewModel.email = it },
-            label = { Text(stringResource(R.string.tf_email_label)) },
-            leadingIcon = { Icon(Icons.Filled.Email, null) },
-            keyboardOptions = KeyboardOptions.Default.copy(
-                capitalization = KeyboardCapitalization.None,
-                keyboardType = KeyboardType.Email,
-                autoCorrectEnabled = false
-            ),
-            modifier = Modifier.fillMaxWidth()
-        )
+    CleanableOutlinedTextField(
+        text = email,
+        onTextChange = onEmailChanged,
+        label = { Text(stringResource(R.string.tf_email_label)) },
+        leadingIcon = { Icon(Icons.Filled.Email, null) },
+        keyboardOptions = KeyboardOptions.Default.copy(
+            capitalization = KeyboardCapitalization.None,
+            keyboardType = KeyboardType.Email,
+            autoCorrectEnabled = false
+        ),
+        modifier = Modifier.fillMaxWidth()
+    )
 
-        PasswordOutlinedTextField(
-            password = viewModel.password,
-            onPasswordChange = { viewModel.password = it },
-            label = stringResource(R.string.tf_password_label),
-            leadingIcon = { Icon(Icons.Filled.Lock, null) },
-            modifier = Modifier.fillMaxWidth()
-        )
-    }
+    PasswordOutlinedTextField(
+        password = password,
+        onPasswordChange = onPasswordChanged,
+        label = stringResource(R.string.tf_password_label),
+        leadingIcon = { Icon(Icons.Filled.Lock, null) },
+        modifier = Modifier.fillMaxWidth()
+    )
 }

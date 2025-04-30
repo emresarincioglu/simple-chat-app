@@ -1,10 +1,12 @@
 package com.example.simplechat.feature.home.view
 
+import android.net.Uri
 import android.text.format.DateUtils
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -60,10 +62,12 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -72,7 +76,10 @@ import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import coil3.compose.AsyncImage
+import coil3.compose.AsyncImagePainter
+import coil3.compose.LocalPlatformContext
 import coil3.compose.rememberAsyncImagePainter
+import coil3.request.ImageRequest
 import com.example.simplechat.core.common.model.message.ImageMessage
 import com.example.simplechat.core.common.model.message.Message
 import com.example.simplechat.core.common.model.message.TextMessage
@@ -80,6 +87,7 @@ import com.example.simplechat.core.ui.composable.NavigateBackButton
 import com.example.simplechat.core.ui.showToast
 import com.example.simplechat.feature.home.R
 import com.example.simplechat.feature.home.viewmodel.ChatViewModel
+import kotlin.math.roundToInt
 import com.example.simplechat.core.ui.R as coreUiR
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -154,15 +162,18 @@ fun ChatScreen(
         contentWindowInsets = ScaffoldDefaults.contentWindowInsets.exclude(WindowInsets.navigationBars)
     ) { paddings ->
         val oldMessages = viewModel.oldMessagesStream.collectAsLazyPagingItems()
+        val newMessages by viewModel.newMessagesStream.collectAsStateWithLifecycle(emptyList())
 
         Column(modifier = modifier.padding(paddings)) {
             MessageList(
-                oldMessages = oldMessages, viewModel = viewModel, modifier = Modifier.weight(1f)
+                oldMessages = oldMessages, newMessages = newMessages, modifier = Modifier.weight(1f)
             )
 
             // TODO: Change background color
             MessageBottomBar(
-                viewModel = viewModel,
+                onSendImage = viewModel::sendImage,
+                onSendMessage = viewModel::sendMessage,
+                onIsImageSafe = viewModel::isImageSafe,
                 modifier = Modifier
                     .background(MaterialTheme.colorScheme.background)
                     .fillMaxWidth()
@@ -184,41 +195,38 @@ fun ChatScreen(
 
 @Composable
 private fun MessageList(
-    oldMessages: LazyPagingItems<Message>, viewModel: ChatViewModel, modifier: Modifier = Modifier
+    oldMessages: LazyPagingItems<Message>, newMessages: List<Message>, modifier: Modifier = Modifier
+) = LazyColumn(
+    contentPadding = PaddingValues(vertical = 16.dp, horizontal = 8.dp),
+    reverseLayout = true,
+    modifier = modifier
 ) {
-    val newMessages by viewModel.newMessagesStream.collectAsStateWithLifecycle(emptyList())
-    LazyColumn(
-        contentPadding = PaddingValues(vertical = 16.dp, horizontal = 8.dp),
-        reverseLayout = true,
-        modifier = modifier
-    ) {
-        items(newMessages) { message ->
-            Spacer(modifier = Modifier.height(8.dp))
-            if (message.isFromUser) {
-                UserMessageBubble(message)
-            } else {
-                FriendMessageBubble(message)
-            }
+    items(newMessages) { message ->
+        Spacer(modifier = Modifier.height(8.dp))
+        if (message.isFromUser) {
+            UserMessageBubble(message)
+        } else {
+            FriendMessageBubble(message)
         }
+    }
 
-        items(count = oldMessages.itemCount) { index ->
-            Spacer(modifier = Modifier.height(8.dp))
-            val message = oldMessages[index]!!
-            if (message.isFromUser) {
-                UserMessageBubble(message)
-            } else {
-                FriendMessageBubble(message)
-            }
+    items(count = oldMessages.itemCount) { index ->
+        Spacer(modifier = Modifier.height(8.dp))
+        val message = oldMessages[index]!!
+        if (message.isFromUser) {
+            UserMessageBubble(message)
+        } else {
+            FriendMessageBubble(message)
         }
+    }
 
-        if (oldMessages.loadState.append == LoadState.Loading) {
-            item {
-                CircularProgressIndicator(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .wrapContentWidth(Alignment.CenterHorizontally)
-                )
-            }
+    if (oldMessages.loadState.append == LoadState.Loading) {
+        item {
+            CircularProgressIndicator(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentWidth(Alignment.CenterHorizontally)
+            )
         }
     }
 }
@@ -270,12 +278,44 @@ private fun UserMessageBubble(message: Message, modifier: Modifier = Modifier) {
                     overflow = TextOverflow.Ellipsis
                 )
 
-                is ImageMessage -> AsyncImage(
-                    model = message.imageUrl,
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.size(100.dp)
-                )
+                is ImageMessage -> {
+                    val imageSize = 100.dp
+                    val painter = rememberAsyncImagePainter(
+                        model = ImageRequest.Builder(LocalPlatformContext.current)
+                            .data(message.imageUrl)
+                            .size(with(LocalDensity.current) { imageSize.toPx().roundToInt() })
+                            .build()
+                    )
+                    val loadState by painter.state.collectAsStateWithLifecycle()
+
+                    when (loadState) {
+                        is AsyncImagePainter.State.Loading -> CircularProgressIndicator(
+                            modifier = Modifier
+                                .size(imageSize)
+                                .background(MaterialTheme.colorScheme.background)
+                                .padding(16.dp)
+                        )
+
+                        is AsyncImagePainter.State.Success -> Image(
+                            painter = painter,
+                            contentDescription = null,
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier.size(imageSize)
+                        )
+
+                        is AsyncImagePainter.State.Error -> Text(
+                            text = stringResource(R.string.error_image_could_not_loaded),
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onError,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier
+                                .size(imageSize)
+                                .background(MaterialTheme.colorScheme.error)
+                        )
+
+                        else -> Unit
+                    }
+                }
 
                 else -> throw Exception("Unhandled message type")
             }
@@ -333,12 +373,44 @@ private fun FriendMessageBubble(message: Message, modifier: Modifier = Modifier)
                         modifier = Modifier.align(Alignment.End)
                     )
 
-                    is ImageMessage -> AsyncImage(
-                        model = message.imageUrl,
-                        contentDescription = null,
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier.size(100.dp)
-                    )
+                    is ImageMessage -> {
+                        val imageSize = 100.dp
+                        val painter = rememberAsyncImagePainter(
+                            model = ImageRequest.Builder(LocalPlatformContext.current)
+                                .data(message.imageUrl)
+                                .size(with(LocalDensity.current) { imageSize.toPx().roundToInt() })
+                                .build()
+                        )
+                        val loadState by painter.state.collectAsStateWithLifecycle()
+
+                        when (loadState) {
+                            is AsyncImagePainter.State.Loading -> CircularProgressIndicator(
+                                modifier = Modifier
+                                    .size(imageSize)
+                                    .background(MaterialTheme.colorScheme.background)
+                                    .padding(16.dp)
+                            )
+
+                            is AsyncImagePainter.State.Success -> Image(
+                                painter = painter,
+                                contentDescription = null,
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier.size(imageSize)
+                            )
+
+                            is AsyncImagePainter.State.Error -> Text(
+                                text = stringResource(R.string.error_image_could_not_loaded),
+                                style = MaterialTheme.typography.titleMedium,
+                                color = MaterialTheme.colorScheme.onError,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier
+                                    .size(imageSize)
+                                    .background(MaterialTheme.colorScheme.error)
+                            )
+
+                            else -> Unit
+                        }
+                    }
 
                     else -> throw Exception("Unhandled message type")
                 }
@@ -348,7 +420,12 @@ private fun FriendMessageBubble(message: Message, modifier: Modifier = Modifier)
 }
 
 @Composable
-private fun MessageBottomBar(viewModel: ChatViewModel, modifier: Modifier = Modifier) {
+private fun MessageBottomBar(
+    onSendImage: (Uri) -> Unit,
+    onSendMessage: (String) -> Unit,
+    onIsImageSafe: (Uri) -> Boolean,
+    modifier: Modifier = Modifier
+) {
     var message by rememberSaveable { mutableStateOf("") }
 
     Row(
@@ -368,9 +445,9 @@ private fun MessageBottomBar(viewModel: ChatViewModel, modifier: Modifier = Modi
                 val context = LocalContext.current
                 val imagePicker = rememberLauncherForActivityResult(PickVisualMedia()) { uri ->
                     uri?.let {
-                        if (viewModel.isImageSafe(uri)) {
+                        if (onIsImageSafe(uri)) {
                             // TODO: Add image send indicator
-                            viewModel.sendImage(uri)
+                            onSendImage(uri)
                         } else {
                             context.showToast(
                                 coreUiR.string.error_image_is_nsfw, Toast.LENGTH_SHORT
@@ -398,7 +475,7 @@ private fun MessageBottomBar(viewModel: ChatViewModel, modifier: Modifier = Modi
         IconButton(
             onClick = {
                 if (message.isNotBlank()) {
-                    viewModel.sendMessage(message.trim())
+                    onSendMessage(message.trim())
                     message = ""
                 }
             },

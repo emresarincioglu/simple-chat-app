@@ -1,8 +1,9 @@
 package com.example.simplechat.feature.home.view
 
+import android.content.Intent
+import android.graphics.Bitmap
 import android.text.format.DateUtils
 import android.widget.Toast
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -134,22 +135,26 @@ fun HomeScreen(
         )
 
         if (showFriendCodeDialog) {
-            FriendCodeDialog(viewModel = viewModel, onDismiss = { showFriendCodeDialog = false })
+            val (friendCodeQr, friendCode) = remember { viewModel.getUserFriendCode() }
+            FriendCodeDialog(
+                friendCode = friendCode,
+                friendCodeQr = friendCodeQr,
+                onDismiss = { showFriendCodeDialog = false })
         }
     }
 }
 
 @Composable
 private fun FriendList(
-    onNavigateChat: (Int) -> Unit,
     friends: List<Pair<Friend, Message?>>,
+    onNavigateChat: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val placeholder = rememberAsyncImagePainter(model = coreUiR.drawable.avatar_placeholder)
     LazyColumn(modifier = modifier) {
         itemsIndexed(friends, key = { _, (friend, _) -> friend.id }) { index, (friend, message) ->
             Column {
-                FriendListItem(onNavigateChat, friend, message, placeholder)
+                FriendListItem(friend, message, placeholder, onNavigateChat)
 
                 if (index < friends.lastIndex) {
                     HorizontalDivider()
@@ -161,10 +166,10 @@ private fun FriendList(
 
 @Composable
 private fun FriendListItem(
-    onNavigateChat: (Int) -> Unit,
     friend: Friend,
     lastMessage: Message?,
     placeholder: Painter,
+    onNavigateChat: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) = ListItem(
     headlineContent = {
@@ -217,38 +222,38 @@ private fun FriendListItem(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun FriendCodeDialog(
-    viewModel: HomeViewModel, onDismiss: () -> Unit, modifier: Modifier = Modifier
+    friendCode: String, friendCodeQr: Bitmap, onDismiss: () -> Unit, modifier: Modifier = Modifier
 ) = BasicAlertDialog(onDismissRequest = onDismiss) {
     Surface(shape = MaterialTheme.shapes.large, tonalElevation = 8.dp) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = modifier.padding(16.dp)
         ) {
-            var showText by rememberSaveable { mutableStateOf(false) }
-            val (qr, friendCode) = remember { viewModel.getUserFriendCode() }
-
             Text(
                 text = stringResource(R.string.dialog_share_friend_code_title),
                 style = MaterialTheme.typography.headlineSmall
             )
 
+            val context = LocalContext.current
             Image(
-                bitmap = qr.asImageBitmap(),
+                bitmap = friendCodeQr.asImageBitmap(),
                 contentDescription = stringResource(R.string.iv_friend_code_cont_desc),
                 contentScale = ContentScale.FillBounds,
                 modifier = Modifier
                     .size(250.dp)
                     .padding(top = 16.dp)
-                    .clickable { showText = !showText }
-            )
+                    .clickable {
+                        val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                            putExtra(Intent.EXTRA_TEXT, friendCode)
+                            type = "text/plain"
+                        }
 
-            AnimatedVisibility(visible = showText) {
-                Text(
-                    text = friendCode,
-                    maxLines = 1,
-                    modifier = Modifier.padding(top = 8.dp)
-                )
-            }
+                        val chooser = Intent.createChooser(
+                            shareIntent, context.getString(R.string.tv_share_friend_code_title)
+                        )
+                        context.startActivity(chooser)
+                    }
+            )
 
             TextButton(
                 onClick = onDismiss,

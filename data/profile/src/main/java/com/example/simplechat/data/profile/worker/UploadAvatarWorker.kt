@@ -34,16 +34,12 @@ class UploadAvatarWorker @AssistedInject constructor(
 
     override suspend fun doWork(): Result {
         val userId = inputData.getString(DATA_USER_ID)!!
-        val compressedImageFile = File(
-            applicationContext.cacheDir,
-            inputData.getString(DATA_COMPRESSED_IMAGE_FILE_NAME)!!
-        )
+        val imageFileName = inputData.getString(DATA_COMPRESSED_IMAGE_FILE_NAME)!!
+
+        val compressedImageFile = File(applicationContext.cacheDir, imageFileName)
+        if (!compressedImageFile.exists()) return Result.failure()
 
         return try {
-            if (!compressedImageFile.exists()) {
-                return Result.failure()
-            }
-
             compressedImageFile.inputStream().use { inStream ->
                 repository._uploadAvatar(userId, inStream, compressedImageFile.extension)
             }

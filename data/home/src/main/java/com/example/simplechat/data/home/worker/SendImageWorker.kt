@@ -54,12 +54,12 @@ class SendImageWorker @AssistedInject constructor(
             userFile.inputStream().use { userFileStream ->
                 friendFile.inputStream().use { friendFileStream ->
                     repository._sendImage(
-                        userId,
-                        friendRecordId,
-                        recordPathOfUser,
-                        userFileStream,
-                        friendFileStream,
-                        userFile.extension
+                        remoteUserId = userId,
+                        friendRecordId = friendRecordId,
+                        recordPathOfUser = recordPathOfUser,
+                        userEncryptedImageStream = userFileStream,
+                        friendEncryptedImageStream = friendFileStream,
+                        fileExtension = userFile.extension
                     )
                 }
             }

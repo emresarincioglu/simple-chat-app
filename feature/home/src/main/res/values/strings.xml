@@ -8,6 +8,7 @@
     <string name="btn_delete_friend_cont_desc">Delete friend</string>
     <string name="iv_friend_code_cont_desc">User\'s friend code qr</string>
     <string name="btn_scan_friend_qr_code_cont_desc">Scan friend qr code</string>
+    <string name="btn_share_friend_code_cont_desc">Share friend code</string>
 
     <!-- Text Fields -->
     <eat-comment />
@@ -27,4 +28,16 @@
     <string name="dialog_share_friend_code_title">Share Friend Code</string>
     <string name="dialog_confirm_delete_friend_title">Delete friend</string>
     <string name="dialog_confirm_delete_friend_text">Do you want to delete your friend? You won\'t be able to access your messages.</string>
+
+    <!-- Errors -->
+    <eat-comment />
+    <string name="error_image_could_not_loaded">Load failed</string>
+
+    <!-- Text Views -->
+    <eat-comment />
+    <string name="tv_share_friend_code_title">Share friend code via</string>
+
+    <!-- Toasts -->
+    <eat-comment />
+    <string name="toast_friend_code_copied">Friend code copied</string>
 </resources>

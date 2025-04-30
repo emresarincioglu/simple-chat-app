@@ -14,10 +14,6 @@ class EncryptedImageDecoderFactory @Inject constructor(private val cryptoManager
         result: SourceFetchResult, options: Options, imageLoader: ImageLoader
     ): Decoder? {
         val type = result.mimeType.orEmpty().substringAfter("image/encrypt", "")
-        return if (type.isNotEmpty()) {
-            EncryptedImageDecoder(result.source, cryptoManager)
-        } else {
-            null
-        }
+        return if (type.isNotEmpty()) EncryptedImageDecoder(result.source, cryptoManager) else null
     }
 }

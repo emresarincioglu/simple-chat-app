@@ -42,9 +42,7 @@ class EncryptImageWorker @AssistedInject constructor(
         val compressedImageFileName = inputData.getString(DATA_COMPRESSED_IMAGE_FILE_NAME)!!
 
         val compressedImageFile = File(cacheDir, compressedImageFileName)
-        if (!compressedImageFile.exists()) {
-            return Result.failure()
-        }
+        if (!compressedImageFile.exists()) return Result.failure()
 
         val extension = ".encrypt${compressedImageFile.extension}"
         val userEncryptedImageFile = applicationContext.createTempFile(extension)
