@@ -97,10 +97,6 @@ class DefaultAuthenticationRepository @Inject constructor(
         }
     }
 
-    override suspend fun sendPasswordResetEmail(email: String) = withContext(ioDispatcher) {
-        remoteAuth.sendPasswordResetEmail(email)
-    }
-
     override fun clearCache() {
         localUserId = null
         remoteUserId = null

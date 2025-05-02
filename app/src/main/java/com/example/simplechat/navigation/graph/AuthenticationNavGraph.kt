@@ -8,10 +8,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import com.example.simplechat.feature.authentication.view.LoginScreen
-import com.example.simplechat.feature.authentication.view.PasswordResetScreen
 import com.example.simplechat.feature.authentication.view.SignupScreen
 import com.example.simplechat.feature.authentication.viewmodel.LoginViewModel
-import com.example.simplechat.feature.authentication.viewmodel.PasswordResetViewModel
 import com.example.simplechat.feature.authentication.viewmodel.SignupViewModel
 import com.example.simplechat.navigation.route.NavigationRoute
 
@@ -36,9 +34,6 @@ fun NavGraphBuilder.AuthenticationNavGraph(
                 navController.navigate(
                     "${NavigationRoute.SIGNUP_SCREEN.route}/${viewModel.email}/${viewModel.password}"
                 )
-            },
-            onNavigatePasswordReset = {
-                navController.navigate("${NavigationRoute.PASSWORD_RESET_SCREEN.route}/${viewModel.email}")
             }
         )
     }
@@ -59,19 +54,6 @@ fun NavGraphBuilder.AuthenticationNavGraph(
                     savedStateHandle["email"] = viewModel.email
                     savedStateHandle["password"] = viewModel.password
                 }
-                navController.popBackStack()
-            }
-        )
-    }
-
-    composable(
-        route = "${NavigationRoute.PASSWORD_RESET_SCREEN.route}/{email}",
-        arguments = listOf(navArgument("email") { type = NavType.StringType })
-    ) {
-        val viewModel = hiltViewModel<PasswordResetViewModel>()
-        PasswordResetScreen(
-            onNavigateBack = {
-                navController.previousBackStackEntry!!.savedStateHandle["email"] = viewModel.email
                 navController.popBackStack()
             }
         )

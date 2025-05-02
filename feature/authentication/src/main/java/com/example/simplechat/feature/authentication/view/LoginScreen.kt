@@ -18,7 +18,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -46,7 +45,6 @@ import com.example.simplechat.feature.authentication.viewmodel.LoginViewModel
 fun LoginScreen(
     onNavigateHome: () -> Unit,
     onNavigateSignup: () -> Unit,
-    onNavigatePasswordReset: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: LoginViewModel = hiltViewModel()
 ) {
@@ -85,15 +83,11 @@ fun LoginScreen(
                 onEmailChanged = { viewModel.email = it },
                 password = viewModel.password,
                 onPasswordChanged = { viewModel.password = it },
-                onForgetPassword = {
-                    viewModel.cancelRunningActions()
-                    onNavigatePasswordReset()
-                },
                 modifier = Modifier.width(TextFieldDefaults.MinWidth)
             )
 
             AnimatedVisibility(isLoading) {
-                CircularProgressIndicator(modifier = Modifier.padding(top = 16.dp, bottom = 8.dp))
+                CircularProgressIndicator(modifier = Modifier.padding(top = 24.dp))
             }
 
             AuthButtons(
@@ -108,7 +102,7 @@ fun LoginScreen(
                 },
                 modifier = Modifier
                     .width(TextFieldDefaults.MinWidth)
-                    .padding(top = 16.dp)
+                    .padding(top = 24.dp)
             )
         }
     }
@@ -120,14 +114,13 @@ private fun InputTextFields(
     onEmailChanged: (String) -> Unit,
     password: String,
     onPasswordChanged: (String) -> Unit,
-    onForgetPassword: () -> Unit,
     modifier: Modifier = Modifier
 ) = Column(modifier = modifier) {
     CleanableOutlinedTextField(
         text = email,
         onTextChange = onEmailChanged,
         label = { Text(stringResource(R.string.tf_email_label)) },
-        leadingIcon = { Icon(Icons.Filled.Email, null) },
+        leadingIcon = { Icon(imageVector = Icons.Filled.Email, contentDescription = null) },
         keyboardOptions = KeyboardOptions.Default.copy(
             capitalization = KeyboardCapitalization.None,
             keyboardType = KeyboardType.Email,
@@ -140,16 +133,9 @@ private fun InputTextFields(
         password = password,
         onPasswordChange = onPasswordChanged,
         label = stringResource(R.string.tf_password_label),
-        leadingIcon = { Icon(Icons.Filled.Lock, null) },
+        leadingIcon = { Icon(imageVector = Icons.Filled.Lock, contentDescription = null) },
         modifier = Modifier.fillMaxWidth()
     )
-
-    TextButton(
-        onClick = onForgetPassword,
-        modifier = Modifier.align(Alignment.End)
-    ) {
-        Text(stringResource(R.string.btn_forget_password_text))
-    }
 }
 
 @Composable
@@ -158,8 +144,8 @@ private fun AuthButtons(onLogIn: () -> Unit, onSignUp: () -> Unit, modifier: Mod
     Column(modifier = modifier) {
         Button(
             onClick = {
-                onLogIn()
                 keyboardController?.hide()
+                onLogIn()
             },
             modifier = Modifier.fillMaxWidth()
         ) {
@@ -170,7 +156,7 @@ private fun AuthButtons(onLogIn: () -> Unit, onSignUp: () -> Unit, modifier: Mod
             onClick = onSignUp,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 4.dp)
+                .padding(top = 2.dp)
         ) {
             Text(stringResource(R.string.btn_signup_text))
         }

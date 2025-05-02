@@ -68,7 +68,7 @@ class SendImageWorker @AssistedInject constructor(
             friendFile.delete()
 
             Result.success()
-        } catch (ex: Exception) {
+        } catch (_: Exception) {
             Result.retry()
         }
     }

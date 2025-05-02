@@ -7,7 +7,6 @@ import com.example.simplechat.core.network.NetworkConstraints.FIELD_IV
 import com.example.simplechat.core.network.NetworkConstraints.FIELD_PRIVATE_KEY
 import com.example.simplechat.core.network.NetworkConstraints.FIELD_PUBLIC_KEY
 import com.example.simplechat.core.network.NetworkConstraints.FIELD_USER_NAME
-import com.example.simplechat.core.network.awaitSuccessResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
@@ -50,8 +49,4 @@ class AuthenticationRemoteDataSource @Inject constructor(
     }
 
     fun logOut() = auth.signOut()
-
-    suspend fun sendPasswordResetEmail(email: String): Boolean {
-        return auth.sendPasswordResetEmail(email).awaitSuccessResult()
-    }
 }

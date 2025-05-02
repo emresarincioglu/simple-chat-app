@@ -62,7 +62,7 @@ class CompressImageWorker(context: Context, workerParams: WorkerParameters) :
                     .putString(DATA_COMPRESSED_IMAGE_FILE_NAME, compressedImageFileName)
                     .build()
             )
-        } catch (ex: Exception) {
+        } catch (_: Exception) {
             Result.failure()
         }
     }

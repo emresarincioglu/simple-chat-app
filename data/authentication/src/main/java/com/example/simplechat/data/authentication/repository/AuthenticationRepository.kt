@@ -7,6 +7,5 @@ interface AuthenticationRepository {
     suspend fun initialize()
     suspend fun logIn(email: String, password: String): Boolean
     suspend fun signUp(name: String, email: String, password: String): Boolean
-    suspend fun sendPasswordResetEmail(email: String): Boolean
     fun clearCache()
 }

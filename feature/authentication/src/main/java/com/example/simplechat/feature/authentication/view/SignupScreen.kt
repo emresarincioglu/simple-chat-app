@@ -89,8 +89,8 @@ fun SignupScreen(
             )
 
             Column(
+                verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(24.dp),
                 modifier = Modifier.align(Alignment.Center)
             ) {
                 InputTextFields(
@@ -103,17 +103,21 @@ fun SignupScreen(
                     modifier = Modifier.width(TextFieldDefaults.MinWidth)
                 )
 
-                AnimatedVisibility(visible = isLoading) { CircularProgressIndicator() }
+                AnimatedVisibility(visible = isLoading) {
+                    CircularProgressIndicator(modifier = Modifier.padding(top = 16.dp))
+                }
 
                 val keyboardController = LocalSoftwareKeyboardController.current
                 Button(
                     onClick = {
                         if (!isLoading) {
-                            viewModel.signUp()
                             keyboardController?.hide()
+                            viewModel.signUp()
                         }
                     },
-                    modifier = Modifier.width(TextFieldDefaults.MinWidth)
+                    modifier = Modifier
+                        .width(TextFieldDefaults.MinWidth)
+                        .padding(top = 16.dp)
                 ) {
                     Text(stringResource(R.string.btn_signup_text))
                 }
@@ -136,7 +140,7 @@ private fun InputTextFields(
         text = name,
         onTextChange = onNameChanged,
         label = { Text(stringResource(R.string.tf_full_name_label)) },
-        leadingIcon = { Icon(Icons.Filled.Person, null) },
+        leadingIcon = { Icon(imageVector = Icons.Filled.Person, contentDescription = null) },
         keyboardOptions = KeyboardOptions.Default.copy(
             capitalization = KeyboardCapitalization.Words, autoCorrectEnabled = false
         ),
@@ -147,7 +151,7 @@ private fun InputTextFields(
         text = email,
         onTextChange = onEmailChanged,
         label = { Text(stringResource(R.string.tf_email_label)) },
-        leadingIcon = { Icon(Icons.Filled.Email, null) },
+        leadingIcon = { Icon(imageVector = Icons.Filled.Email, contentDescription = null) },
         keyboardOptions = KeyboardOptions.Default.copy(
             capitalization = KeyboardCapitalization.None,
             keyboardType = KeyboardType.Email,
@@ -160,7 +164,7 @@ private fun InputTextFields(
         password = password,
         onPasswordChange = onPasswordChanged,
         label = stringResource(R.string.tf_password_label),
-        leadingIcon = { Icon(Icons.Filled.Lock, null) },
+        leadingIcon = { Icon(imageVector = Icons.Filled.Lock, contentDescription = null) },
         modifier = Modifier.fillMaxWidth()
     )
 }

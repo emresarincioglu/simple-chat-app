@@ -46,7 +46,7 @@ class UploadAvatarWorker @AssistedInject constructor(
             compressedImageFile.delete()
 
             Result.success()
-        } catch (ex: Exception) {
+        } catch (_: Exception) {
             Result.retry()
         }
     }

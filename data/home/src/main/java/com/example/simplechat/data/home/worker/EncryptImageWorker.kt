@@ -69,7 +69,7 @@ class EncryptImageWorker @AssistedInject constructor(
                     .putString(DATA_FRIEND_ENCRYPTED_IMAGE_FILE_NAME, friendEncryptedImageFile.name)
                     .build()
             )
-        } catch (ex: Exception) {
+        } catch (_: Exception) {
             Result.failure()
         }
     }

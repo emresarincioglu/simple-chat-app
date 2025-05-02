@@ -4,7 +4,6 @@ import com.example.simplechat.data.authentication.repository.AuthenticationRepos
 import com.example.simplechat.data.authentication.repository.SyncRepository
 import com.example.simplechat.domain.authentication.usecase.InitializeCacheUseCase
 import com.example.simplechat.domain.authentication.usecase.LogInUseCase
-import com.example.simplechat.domain.authentication.usecase.SendPasswordResetEmailUseCase
 import com.example.simplechat.domain.authentication.usecase.SignUpUseCase
 import dagger.Module
 import dagger.Provides
@@ -30,12 +29,6 @@ object AuthenticationDomainModule {
         syncRepository: SyncRepository, authenticationRepository: AuthenticationRepository
     ): SignUpUseCase {
         return SignUpUseCase(syncRepository, authenticationRepository)
-    }
-
-    @Provides
-    @Singleton
-    fun provideSendPasswordResetEmailUseCase(authenticationRepository: AuthenticationRepository): SendPasswordResetEmailUseCase {
-        return SendPasswordResetEmailUseCase(authenticationRepository)
     }
 
     @Provides
