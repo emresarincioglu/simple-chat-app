@@ -46,7 +46,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -66,7 +65,10 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImagePainter
+import coil3.compose.LocalPlatformContext
 import coil3.compose.rememberAsyncImagePainter
+import coil3.compose.rememberConstraintsSizeResolver
+import coil3.request.ImageRequest
 import com.example.simplechat.core.common.Result
 import com.example.simplechat.core.ui.composable.CleanableTextField
 import com.example.simplechat.core.ui.composable.PasswordTextField
@@ -85,6 +87,7 @@ fun ProfileScreen(
     viewModel: ProfileViewModel = hiltViewModel()
 ) {
     var dialogType by remember { mutableStateOf(ProfileScreenDialogType.HIDDEN) }
+
     ObserveActionResults(
         onLogOut = onLogOut,
         changePasswordResultStream = viewModel.changePasswordResultStream,
@@ -335,30 +338,31 @@ fun InputDialog(
 private fun PasswordChangeDialog(onDismiss: () -> Unit, onConfirm: (String) -> Unit) {
     var password by remember { mutableStateOf("") }
     var passwordConfirm by remember { mutableStateOf("") }
-    var isError by remember { mutableStateOf(false) }
-    // TODO: Remove errorMessageRes state
-    var errorMessageRes by remember { mutableIntStateOf(0) }
+    var errorMessageRes by remember { mutableStateOf<Int?>(null) }
 
     AlertDialog(
         onDismissRequest = {
             onDismiss()
-            isError = false
+            errorMessageRes = null
             password = ""
         },
         confirmButton = {
-            TextButton(onClick = {
-                if (passwordConfirm.isBlank() || password.isBlank()) {
-                    isError = true
-                    errorMessageRes = R.string.error_blank_inputs
-                } else if (password != passwordConfirm) {
-                    isError = true
-                    errorMessageRes = R.string.error_inputs_not_match
-                } else {
-                    onConfirm(password)
-                    password = ""
-                    passwordConfirm = ""
+            TextButton(
+                onClick = {
+                    if (passwordConfirm.isBlank() || password.isBlank()) {
+                        errorMessageRes = R.string.error_blank_inputs
+                    } else if (password != passwordConfirm) {
+                        errorMessageRes = R.string.error_inputs_not_match
+                    } else {
+                        onConfirm(password)
+                        password = ""
+                        passwordConfirm = ""
+                        errorMessageRes = null
+                    }
                 }
-            }) { Text(stringResource(android.R.string.ok)) }
+            ) {
+                Text(stringResource(android.R.string.ok))
+            }
         },
         dismissButton = {
             TextButton(onClick = {
@@ -375,9 +379,9 @@ private fun PasswordChangeDialog(onDismiss: () -> Unit, onConfirm: (String) -> U
                     password = password,
                     onPasswordChange = {
                         password = it
-                        isError = false
+                        errorMessageRes = null
                     },
-                    isError = isError,
+                    isError = errorMessageRes != null,
                     placeholder = stringResource(R.string.tf_passwd_placeholder)
                 )
 
@@ -385,17 +389,16 @@ private fun PasswordChangeDialog(onDismiss: () -> Unit, onConfirm: (String) -> U
                     password = passwordConfirm,
                     onPasswordChange = {
                         passwordConfirm = it
-                        isError = false
+                        errorMessageRes = null
                     },
-                    isError = isError,
+                    isError = errorMessageRes != null,
                     placeholder = stringResource(R.string.tf_confirm_passwd_placeholder)
                 )
 
-                if (isError) {
-                    Text(stringResource(errorMessageRes), color = MaterialTheme.colorScheme.error)
-                } else {
-                    Text("")
-                }
+                Text(
+                    text = errorMessageRes?.let { stringResource(it) } ?: "",
+                    color = MaterialTheme.colorScheme.error
+                )
             }
         }
     )
@@ -428,40 +431,39 @@ private fun PickAvatarButton(avatar: Any?, onPick: (Uri?) -> Unit, modifier: Mod
         onClick = { imagePickerLauncher.launch(PickVisualMediaRequest(PickVisualMedia.ImageOnly)) },
         modifier = modifier
     ) {
-        if (avatar == null) {
-            Image(
+        val sizeResolver = rememberConstraintsSizeResolver()
+        val painter = rememberAsyncImagePainter(
+            model = ImageRequest.Builder(LocalPlatformContext.current)
+                .data(avatar)
+                .size(sizeResolver)
+                .build()
+        )
+
+        val loadState by painter.state.collectAsStateWithLifecycle()
+        when (loadState) {
+            is AsyncImagePainter.State.Empty,
+            is AsyncImagePainter.State.Error -> Image(
                 painter = painterResource(coreUiR.drawable.ic_person_24),
                 contentDescription = stringResource(R.string.btn_pick_photo_cont_desc),
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
+                    .then(sizeResolver)
+                    .clip(CircleShape)
+                    .fillMaxSize()
+                    .padding(16.dp)
+            )
+
+            is AsyncImagePainter.State.Loading -> CircularProgressIndicator(modifier = Modifier.fillMaxSize())
+
+            is AsyncImagePainter.State.Success -> Image(
+                painter = painter,
+                contentDescription = stringResource(R.string.btn_pick_photo_cont_desc),
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .then(sizeResolver)
                     .clip(CircleShape)
                     .fillMaxSize()
             )
-        } else {
-            val asyncPainter = rememberAsyncImagePainter(model = avatar)
-            val imageState by asyncPainter.state.collectAsStateWithLifecycle()
-            when (imageState) {
-                is AsyncImagePainter.State.Loading -> CircularProgressIndicator()
-
-                is AsyncImagePainter.State.Success -> Image(
-                    painter = asyncPainter,
-                    contentDescription = stringResource(R.string.btn_pick_photo_cont_desc),
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .clip(CircleShape)
-                        .fillMaxSize()
-                )
-
-                is AsyncImagePainter.State.Empty,
-                is AsyncImagePainter.State.Error -> Image(
-                    painter = painterResource(coreUiR.drawable.ic_person_24),
-                    contentDescription = stringResource(R.string.btn_pick_photo_cont_desc),
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .clip(CircleShape)
-                        .fillMaxSize()
-                )
-            }
         }
     }
 }

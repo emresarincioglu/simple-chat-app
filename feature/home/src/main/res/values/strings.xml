@@ -31,7 +31,7 @@
 
     <!-- Errors -->
     <eat-comment />
-    <string name="error_image_could_not_loaded">Load failed</string>
+    <string name="error_image_could_not_loaded">Image could not loaded.</string>
 
     <!-- Text Views -->
     <eat-comment />

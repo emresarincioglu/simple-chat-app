@@ -28,7 +28,7 @@ class SimpleChatApplication : Application(), SingletonImageLoader.Factory, Confi
         .setWorkerFactory(workerFactory)
         .build()
 
-    override fun newImageLoader(context: PlatformContext) = ImageLoader.Builder(this)
+    override fun newImageLoader(context: PlatformContext) = ImageLoader.Builder(context)
         .memoryCachePolicy(CachePolicy.ENABLED)
         .memoryCache {
             MemoryCache.Builder()

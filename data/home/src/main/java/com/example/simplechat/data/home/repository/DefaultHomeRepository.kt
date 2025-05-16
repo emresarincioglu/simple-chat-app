@@ -349,9 +349,7 @@ class DefaultHomeRepository @Inject constructor(
             .enqueue()
     }
 
-    override fun clearCache() {
-        recordPathsOfUser.clear()
-    }
+    override fun clearCache() = recordPathsOfUser.clear()
 
     /**
      * Should not be used in ViewModels

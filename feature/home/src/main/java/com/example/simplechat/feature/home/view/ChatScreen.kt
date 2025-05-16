@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -286,10 +287,11 @@ private fun UserMessageBubble(message: Message, modifier: Modifier = Modifier) {
                             .size(with(LocalDensity.current) { imageSize.toPx().roundToInt() })
                             .build()
                     )
-                    val loadState by painter.state.collectAsStateWithLifecycle()
 
+                    val loadState by painter.state.collectAsStateWithLifecycle()
                     when (loadState) {
                         is AsyncImagePainter.State.Loading -> CircularProgressIndicator(
+                            color = MaterialTheme.colorScheme.onBackground,
                             modifier = Modifier
                                 .size(imageSize)
                                 .background(MaterialTheme.colorScheme.background)
@@ -305,12 +307,13 @@ private fun UserMessageBubble(message: Message, modifier: Modifier = Modifier) {
 
                         is AsyncImagePainter.State.Error -> Text(
                             text = stringResource(R.string.error_image_could_not_loaded),
-                            style = MaterialTheme.typography.titleMedium,
+                            style = MaterialTheme.typography.titleSmall,
                             color = MaterialTheme.colorScheme.onError,
                             textAlign = TextAlign.Center,
                             modifier = Modifier
                                 .size(imageSize)
                                 .background(MaterialTheme.colorScheme.error)
+                                .wrapContentHeight()
                         )
 
                         else -> Unit
@@ -385,6 +388,7 @@ private fun FriendMessageBubble(message: Message, modifier: Modifier = Modifier)
 
                         when (loadState) {
                             is AsyncImagePainter.State.Loading -> CircularProgressIndicator(
+                                color = MaterialTheme.colorScheme.onBackground,
                                 modifier = Modifier
                                     .size(imageSize)
                                     .background(MaterialTheme.colorScheme.background)
@@ -400,12 +404,13 @@ private fun FriendMessageBubble(message: Message, modifier: Modifier = Modifier)
 
                             is AsyncImagePainter.State.Error -> Text(
                                 text = stringResource(R.string.error_image_could_not_loaded),
-                                style = MaterialTheme.typography.titleMedium,
+                                style = MaterialTheme.typography.titleSmall,
                                 color = MaterialTheme.colorScheme.onError,
                                 textAlign = TextAlign.Center,
                                 modifier = Modifier
                                     .size(imageSize)
                                     .background(MaterialTheme.colorScheme.error)
+                                    .wrapContentHeight()
                             )
 
                             else -> Unit
