@@ -52,7 +52,7 @@ class ChatViewModel @Inject constructor(
 
     val newMessagesStream = getFriendNewMessagesStreamUseCase(
         friendId = friendId, maxSize = 40, onOverFlow = pagingSourceFactory::invalidate
-    )
+    ).stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
     fun sendMessage(message: String) {
         viewModelScope.launch {

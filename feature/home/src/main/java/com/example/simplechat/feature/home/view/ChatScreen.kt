@@ -163,7 +163,7 @@ fun ChatScreen(
         contentWindowInsets = ScaffoldDefaults.contentWindowInsets.exclude(WindowInsets.navigationBars)
     ) { paddings ->
         val oldMessages = viewModel.oldMessagesStream.collectAsLazyPagingItems()
-        val newMessages by viewModel.newMessagesStream.collectAsStateWithLifecycle(emptyList())
+        val newMessages by viewModel.newMessagesStream.collectAsStateWithLifecycle()
 
         Column(modifier = modifier.padding(paddings)) {
             MessageList(
